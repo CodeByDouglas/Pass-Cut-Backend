@@ -1,0 +1,13 @@
+
+venv/
+
+/project/.env
+
+__pycache__/
+
+
+
+
+
+
+
