@@ -26,6 +26,8 @@ class BaseModel(db.Model):
 class Estabelecimento(BaseModel):
     __tablename__ = 'estabelecimentos'
 
+    #Número da Base para redirecionamento inicial
+    identificador_base = db.Column(db.String(10), nullable=False,  unique=True, index=True)
     # credenciais de acesso
     email_login = db.Column(db.String(100), nullable=False, unique=True)
     senha_hash = db.Column(db.String(128), nullable=False)
