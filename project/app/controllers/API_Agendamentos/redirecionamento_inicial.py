@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_Inicial import validar_token_inicial
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDBase import verificar_id_base
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Nome_Estabelecimento import verificar_nome_estabelecimento
+from ...services.Services_Agendamentos.Consulta_DataBase.Consulta_ID_Estabelecimento import consultar_estabelecimento
 
 redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix='/api/redirecionamento_inicial')
 
@@ -19,12 +20,21 @@ def redirecionamento_inicial():
             if nome is not None and id_base is not None:
                 # Valida os dados usando as funções correspondentes
                 if verificar_id_base(id_base) and verificar_nome_estabelecimento(nome):
-                    return jsonify({
-                        "status": "success",
-                        "message": "Token e dados recebidos com sucesso.",
-                        "nome": nome,
-                        "ID base": id_base
-                    }), 200
+                    resultado = consultar_estabelecimento(nome, id_base)
+                    if resultado is not False:
+                        sucesso, estabelecimento_id = resultado
+                        return jsonify({
+                            "status": "success",
+                            "message": "Token, dados e estabelecimento validados com sucesso.",
+                            "nome": nome,
+                            "ID base": id_base,
+                            "estabelecimento_id": estabelecimento_id
+                        }), 200
+                    else:
+                        return jsonify({
+                            "status": "error",
+                            "message": "Estabelecimento não encontrado."
+                        }), 404
                 else:
                     return jsonify({
                         "status": "error",

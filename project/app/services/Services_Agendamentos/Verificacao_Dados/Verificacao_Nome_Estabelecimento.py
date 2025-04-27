@@ -2,9 +2,9 @@ import re
 
 def verificar_nome_estabelecimento(nome: str) -> bool:
     """
-    Verifica se o 'nome' recebido é seguro, isto é, se não contém espaços, 
-    caracteres especiais ou padrões maliciosos, permitindo apenas letras e dígitos.
-    Além disso, o nome deve possuir no máximo 100 caracteres.
+    Verifica se o 'nome' recebido é seguro, isto é, se não contém caracteres especiais 
+    ou padrões maliciosos, permitindo apenas letras, dígitos e espaços. Além disso, o nome deve 
+    possuir no máximo 100 caracteres.
 
     Parameters:
         nome (str): Nome a ser validado.
@@ -16,8 +16,8 @@ def verificar_nome_estabelecimento(nome: str) -> bool:
     if len(nome) > 100:
         return False
     
-    # Regex que permite apenas letras (A-Z, a-z) e números (0-9). 
-    padrao = r'^[A-Za-z0-9]+$'
+    # Regex que permite apenas letras (A-Z, a-z), números (0-9) e espaços.
+    padrao = r'^[A-Za-z0-9 ]+$'
     
     if re.fullmatch(padrao, nome):
         return True
