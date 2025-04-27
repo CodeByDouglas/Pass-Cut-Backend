@@ -7,14 +7,25 @@ redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix
 def redirecionamento_inicial():
     token = request.headers.get('Authorization')
     if token:
-        # Chama a função que valida o token recebido
         if validar_token_inicial(token):
+            # Extrai dados do corpo da requisição (JSON)
+            data = request.get_json() or {}
+            nome = data.get("nome")
+            id_base = data.get("ID base")
             
-            return jsonify({
-                "status": "success",
-                "message": "Token recebido com sucesso.",
-                "token": token
-            }), 200
+            # Verifica se ambos os dados estão presentes e não são nulos
+            if nome is not None and id_base is not None:
+                return jsonify({
+                    "status": "success",
+                    "message": "Token e dados recebidos com sucesso.",
+                    "nome": nome,
+                    "ID base": id_base
+                }), 200
+            else:
+                return jsonify({
+                    "status": "error",
+                    "message": "Dados insuficientes"
+                }), 400
         else:
             return jsonify({
                 "status": "error",
