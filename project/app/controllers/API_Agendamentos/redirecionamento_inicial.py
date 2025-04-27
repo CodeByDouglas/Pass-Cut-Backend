@@ -3,6 +3,7 @@ from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_Inicial impo
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDBase import verificar_id_base
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Nome_Estabelecimento import verificar_nome_estabelecimento
 from ...services.Services_Agendamentos.Consulta_DataBase.Consulta_ID_Estabelecimento import consultar_estabelecimento
+from ...services.Services_Agendamentos.Gerar_Token_JWT.Gerar_JWT_IDEstabelecimento import gerar_jwt_id_estabelecimento
 
 redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix='/api/redirecionamento_inicial')
 
@@ -23,12 +24,11 @@ def redirecionamento_inicial():
                     resultado = consultar_estabelecimento(nome, id_base)
                     if resultado is not False:
                         sucesso, estabelecimento_id = resultado
+                        jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
                         return jsonify({
                             "status": "success",
                             "message": "Token, dados e estabelecimento validados com sucesso.",
-                            "nome": nome,
-                            "ID base": id_base,
-                            "estabelecimento_id": estabelecimento_id
+                            "Token": jwt_token
                         }), 200
                     else:
                         return jsonify({
