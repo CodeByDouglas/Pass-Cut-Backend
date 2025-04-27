@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_Inicial import validar_token_inicial
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDBase import verificar_id_base
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Nome_Estabelecimento import verificar_nome_estabelecimento
 
 redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix='/api/redirecionamento_inicial')
 
@@ -15,12 +17,19 @@ def redirecionamento_inicial():
             
             # Verifica se ambos os dados estão presentes e não são nulos
             if nome is not None and id_base is not None:
-                return jsonify({
-                    "status": "success",
-                    "message": "Token e dados recebidos com sucesso.",
-                    "nome": nome,
-                    "ID base": id_base
-                }), 200
+                # Valida os dados usando as funções correspondentes
+                if verificar_id_base(id_base) and verificar_nome_estabelecimento(nome):
+                    return jsonify({
+                        "status": "success",
+                        "message": "Token e dados recebidos com sucesso.",
+                        "nome": nome,
+                        "ID base": id_base
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Dados invalidos"
+                    }), 400
             else:
                 return jsonify({
                     "status": "error",
