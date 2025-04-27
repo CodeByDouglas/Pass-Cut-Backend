@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from dotenv import load_dotenv  # ou: from dotenv import load_dotenv
+from dotenv import load_dotenv
 from .config import Config
 from .extensions import db, migrate, jwt, cors
 
@@ -15,6 +15,9 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     jwt.init_app(app)
     cors.init_app(app)
+
+    # importa os models para que o SQLAlchemy os registre
+    from .models import models
 
     # registra um healthcheck simples
     @app.route("/health")
