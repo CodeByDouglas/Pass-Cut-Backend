@@ -4,10 +4,16 @@ redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix
 
 @redirecionamento_bp.route('', methods=['POST'])
 def redirecionamento_inicial():
-    data = request.get_json() or {}
-    # Coloque aqui a lógica necessária para o redirecionamento
-    return jsonify({
-        "status": "success",
-        "message": "Rota POST 'redirecionamento_inicial' chamada com sucesso.",
-        "data": data
-    }), 200
+    token = request.headers.get('Authorization')
+    if token:
+        print(token)
+        return jsonify({
+            "status": "success",
+            "message": "Token recebido com sucesso.",
+            "token": token
+        }), 200
+    else:
+        return jsonify({
+            "status": "error",
+            "message": "Erro de autenticação"
+        }), 401
