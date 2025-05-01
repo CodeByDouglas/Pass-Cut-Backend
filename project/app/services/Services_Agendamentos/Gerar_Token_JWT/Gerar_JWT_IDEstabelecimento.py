@@ -16,9 +16,9 @@ def gerar_jwt_id_estabelecimento(estabelecimento_id: str, exp_minutes: int = 60)
     Returns:
         str: O token JWT.
     """
-    secret = os.getenv("SECRET_KEY")
+    secret = os.getenv("SECRET_KEY_ID_ESTABELECIMENTO")
     if not secret:
-        raise ValueError("SECRET_KEY não está definida nas variáveis de ambiente.")
+        raise ValueError("SECRET_KEY_ID_ESTABELECIMENTO não está definida nas variáveis de ambiente.")
     
     payload = {
         "id": estabelecimento_id,
