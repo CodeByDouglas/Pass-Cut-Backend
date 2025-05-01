@@ -6,6 +6,7 @@ from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_estebelec
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
 from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
+from ...services.Services_Agendamentos.Hashe_senha.Autendicar_senha import autenticar_senha
 
 autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/autenticar_user')
 
@@ -40,12 +41,19 @@ def autenticar_user():
                             if consulta is not False:
                                 # Desempacota o resultado para obter o ID do user
                                 _, user_id = consulta
-                                return jsonify({
-                                    "status": "success",
-                                    "message": "Requisição POST recebida com sucesso.",
-                                    "estabelecimento_id": estabelecimento_id,
-                                    "user_id": user_id
-                                }), 200
+                                # Chama a função para autenticar a senha
+                                if autenticar_senha(estabelecimento_id, user_id, senha):
+                                    return jsonify({
+                                        "status": "success",
+                                        "message": "Requisição POST recebida com sucesso.",
+                                        "estabelecimento_id": estabelecimento_id,
+                                        "user_id": user_id
+                                    }), 200
+                                else:
+                                    return jsonify({
+                                        "status": "error",
+                                        "message": "Erro de autenticar user"
+                                    }), 401
                             else:
                                 return jsonify({
                                     "status": "error",
