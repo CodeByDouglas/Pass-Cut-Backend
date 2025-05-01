@@ -22,14 +22,27 @@ def autenticar_user():
                 if resultado is not False:
                     # Desempacota o resultado para obter o ID do estabelecimento
                     _, estabelecimento_id = resultado
-                    return jsonify({
-                        "status": "success",
-                        "message": "Requisição POST recebida com sucesso.",
-                        "estabelecimento_id": estabelecimento_id
-                    }), 200
+                    
+                    # Recupera dados do corpo da requisição utilizando silent=True para evitar 400 Bad Request
+                    data = request.get_json(silent=True) or {}
+                    login = data.get("login")
+                    senha = data.get("senha")
+                    
+                    # Verifica se "login" e "senha" estão presentes e não vazios
+                    if login and senha:
+                        return jsonify({
+                            "status": "success",
+                            "message": "Requisição POST recebida com sucesso.",
+                            "estabelecimento_id": estabelecimento_id
+                        }), 200
+                    else:
+                        return jsonify({
+                            "status": "error",
+                            "message": "Erro de dados insuficientes"
+                        }), 411
                 return jsonify({
-                "status": "error",
-                "message": "Erro de autenticação - token id"
+                    "status": "error",
+                    "message": "Erro de autenticação - token id"
                 }), 401
             return jsonify({
                 "status": "error",
@@ -37,5 +50,5 @@ def autenticar_user():
             }), 401
     return jsonify({
         "status": "error",
-        "message": "Erro de autenticação - formatos invlidos"
+        "message": "Erro de autenticação - formatos inválidos"
     }), 401
