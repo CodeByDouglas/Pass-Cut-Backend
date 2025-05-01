@@ -3,6 +3,8 @@ from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet 
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
 
 autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/autenticar_user')
 
@@ -28,13 +30,20 @@ def autenticar_user():
                     login = data.get("login")
                     senha = data.get("senha")
                     
-                    # Verifica se "login" e "senha" estão presentes e não vazios
+                    # Verifica se "login" e "senha" estão presentes e não são vazios
                     if login and senha:
-                        return jsonify({
-                            "status": "success",
-                            "message": "Requisição POST recebida com sucesso.",
-                            "estabelecimento_id": estabelecimento_id
-                        }), 200
+                        # Valida o email e a senha
+                        if verificar_email(login) and verificar_senha(senha):
+                            return jsonify({
+                                "status": "success",
+                                "message": "Requisição POST recebida com sucesso.",
+                                "estabelecimento_id": estabelecimento_id
+                            }), 200
+                        else:
+                            return jsonify({
+                                "status": "error",
+                                "message": "Erro de dados invalidos"
+                            }), 400
                     else:
                         return jsonify({
                             "status": "error",

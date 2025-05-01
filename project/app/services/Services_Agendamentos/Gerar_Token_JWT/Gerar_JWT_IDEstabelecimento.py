@@ -1,6 +1,6 @@
 import os
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,7 +22,7 @@ def gerar_jwt_id_estabelecimento(estabelecimento_id: str, exp_minutes: int = 60)
     
     payload = {
         "id": estabelecimento_id,
-        "exp": datetime.utcnow() + timedelta(minutes=exp_minutes)
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=exp_minutes)
     }
     
     token = jwt.encode(payload, secret, algorithm="HS256")
