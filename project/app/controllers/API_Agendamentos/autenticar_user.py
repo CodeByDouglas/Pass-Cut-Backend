@@ -48,13 +48,13 @@ def autenticar_user():
                                     jwt_token = gerar_jwt_id_estabelecimento(user_id)
                                     return jsonify({
                                         "status": "success",
-                                        "message": "Requisição POST recebida com sucesso.",
+                                        "message": "User autenticado",
                                         "token": jwt_token
                                     }), 200
                                 else:
                                     return jsonify({
                                         "status": "error",
-                                        "message": "Erro de autenticar user"
+                                        "message": "Erro ao autenticar user"
                                     }), 401
                             else:
                                 return jsonify({
@@ -64,22 +64,22 @@ def autenticar_user():
                         else:
                             return jsonify({
                                 "status": "error",
-                                "message": "Erro de dados invalidos"
+                                "message": "Erro dados invalidos"
                             }), 400
                     else:
                         return jsonify({
                             "status": "error",
-                            "message": "Erro de dados insuficientes"
+                            "message": "Erro dados insuficientes"
                         }), 411
                 return jsonify({
                     "status": "error",
-                    "message": "Erro de autenticação - token id"
+                    "message": "Erro de autenticação"
                 }), 401
             return jsonify({
                 "status": "error",
-                "message": "Erro de autenticação - token aut"
+                "message": "Erro de autenticação"
             }), 401
     return jsonify({
         "status": "error",
-        "message": "Erro de autenticação - formatos inválidos"
+        "message": "Erro de autenticação"
     }), 401

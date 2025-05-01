@@ -31,7 +31,7 @@ def redirecionamento_inicial():
                             jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
                             return jsonify({
                                 "status": "success",
-                                "message": "Token, dados e estabelecimento validados com sucesso.",
+                                "message": "Base autenticada",
                                 "Token": jwt_token
                             }), 200
                         else:
