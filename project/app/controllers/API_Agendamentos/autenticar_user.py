@@ -5,6 +5,7 @@ from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_autenticar_u
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
+from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
 
 autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/autenticar_user')
 
@@ -34,11 +35,22 @@ def autenticar_user():
                     if login and senha:
                         # Valida o email e a senha
                         if verificar_email(login) and verificar_senha(senha):
-                            return jsonify({
-                                "status": "success",
-                                "message": "Requisição POST recebida com sucesso.",
-                                "estabelecimento_id": estabelecimento_id
-                            }), 200
+                            # Consulta o ID do user a partir do ID do estabelecimento e do email (login)
+                            consulta = consultar_id_user(estabelecimento_id, login)
+                            if consulta is not False:
+                                # Desempacota o resultado para obter o ID do user
+                                _, user_id = consulta
+                                return jsonify({
+                                    "status": "success",
+                                    "message": "Requisição POST recebida com sucesso.",
+                                    "estabelecimento_id": estabelecimento_id,
+                                    "user_id": user_id
+                                }), 200
+                            else:
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Usuário não encontrado"
+                                }), 401
                         else:
                             return jsonify({
                                 "status": "error",
