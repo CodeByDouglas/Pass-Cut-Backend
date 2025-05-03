@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from app.extensions import db
 
 
@@ -149,14 +149,17 @@ class Agendamento(BaseModel):
     colaborador_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('colaboradores.id'), nullable=False
     )
-    servico_id = db.Column(
-        UUID(as_uuid=True), db.ForeignKey('servicos.id'), nullable=False
-    )
     estabelecimento_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False
     )
     assinatura_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('assinaturas.id'), nullable=True
     )
+    servico_ids = db.Column(
+        ARRAY(UUID(as_uuid=True)),default=list,nullable=False,
+        
+    )
+
+    duracao = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='pendente', nullable=False)
