@@ -4,6 +4,7 @@ from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT imp
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_consulta_agendamentos import validar_token_consultar_agendamentos
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_agendamentos_no_DB import consultar_agendamentos_por_estabelecimento_cliente_status
 # ...existing code...
 consultar_agendamentos_bp = Blueprint('consultar_agendamentos', __name__, url_prefix='/api/consultar_agendamentos')
 
@@ -29,12 +30,24 @@ def consultar_agendamentos():
                         data = request.get_json(silent=True) or {}
                         type_param = data.get("type")
                         if type_param:
-                            return jsonify({
-                                "status": "success",
-                                "message": "Consulta realizada com sucesso.",
-                                "estabelecimento_id": estabelecimento_id,
-                                "user_id": user_id
-                            }), 200
+                            if type_param in ["ativos", "historico"]:
+                                agendamentos = consultar_agendamentos_por_estabelecimento_cliente_status(estabelecimento_id, user_id, type_param)
+                                if agendamentos is not None:
+                                    return jsonify({
+                                        "status": "success",
+                                        "message": "Consulta realizada com sucesso.",
+                                        "agendamentos": agendamentos
+                                    }), 200
+                                else:
+                                    return jsonify({
+                                        "status": "success",
+                                        "message": "Nenhum agendamento encontrado para os dados informados."
+                                    }), 200
+                            else:
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Dados invalidos"
+                                }), 400
                         else:
                             return jsonify({
                                 "status": "error",
