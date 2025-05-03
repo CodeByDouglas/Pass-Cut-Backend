@@ -3,6 +3,12 @@ from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from app.extensions import db
 
+# Tabela de associação para muitos-para-muitos entre Agendamento e Serviço
+agendamento_servico = db.Table(
+    'agendamento_servico',
+    db.Column('agendamento_id', UUID(as_uuid=True), db.ForeignKey('agendamentos.id'), primary_key=True),
+    db.Column('servico_id', UUID(as_uuid=True), db.ForeignKey('servicos.id'), primary_key=True)
+)
 
 # BaseModel com UUID, timestamps e soft-delete
 default_datetime = datetime.utcnow
@@ -102,7 +108,8 @@ class Servico(BaseModel):
         UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False
     )
 
-    agendamentos = db.relationship('Agendamento', backref='servico', lazy=True)
+    # Relacionamento muitos-para-muitos com Agendamento
+    agendamentos = db.relationship('Agendamento', secondary=agendamento_servico, back_populates='servicos', lazy=True)
 
 
 # Plano de assinatura
@@ -155,11 +162,10 @@ class Agendamento(BaseModel):
     assinatura_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('assinaturas.id'), nullable=True
     )
-    servico_ids = db.Column(
-        ARRAY(UUID(as_uuid=True)),default=list,nullable=False,
-        
-    )
 
     duracao = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='pendente', nullable=False)
+
+    # Relacionamento muitos-para-muitos com Servico
+    servicos = db.relationship('Servico', secondary=agendamento_servico, back_populates='agendamentos', lazy=True)
