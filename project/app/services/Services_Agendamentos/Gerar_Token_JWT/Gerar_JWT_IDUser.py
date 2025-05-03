@@ -28,3 +28,4 @@ def gerar_jwt_id_estabelecimento(cliente_id: str, exp_minutes: int = 60) -> str:
     token = jwt.encode(payload, secret, algorithm="HS256")
     return token
 
+print(gerar_jwt_id_estabelecimento("estvel"))
