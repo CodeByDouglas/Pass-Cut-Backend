@@ -100,6 +100,7 @@ class Servico(BaseModel):
     __tablename__ = 'servicos'
 
     nome = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text, nullable=True)  # novo campo de texto
     duracao = db.Column(db.Integer, nullable=False)  # em minutos
     preco = db.Column(default_numeric, nullable=False)
     ativo = db.Column(db.Boolean, default=True, nullable=False)
@@ -109,7 +110,8 @@ class Servico(BaseModel):
     )
 
     # Relacionamento muitos-para-muitos com Agendamento
-    agendamentos = db.relationship('Agendamento', secondary=agendamento_servico, back_populates='servicos', lazy=True)
+    agendamentos = db.relationship('Agendamento', secondary=agendamento_servico, back_populates='servicos',lazy=True)
+
 
 
 # Plano de assinatura
