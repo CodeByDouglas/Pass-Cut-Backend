@@ -6,6 +6,7 @@ from .extensions import db, migrate, jwt, cors
 from .controllers.API_Agendamentos.redirecionamento_inicial import redirecionamento_bp
 from .controllers.API_Agendamentos.autenticar_user import autenticar_user_bp
 from .controllers.API_Agendamentos.consultar_agendamentos import consultar_agendamentos_bp
+from .controllers.API_Agendamentos.consultar_servicos import consultar_servicos_bp
 
 def create_app(config_class=Config):
     # carrega .env
@@ -25,4 +26,5 @@ def create_app(config_class=Config):
     app.register_blueprint(redirecionamento_bp)
     app.register_blueprint(autenticar_user_bp)
     app.register_blueprint(consultar_agendamentos_bp)
+    app.register_blueprint(consultar_servicos_bp)
     return app
