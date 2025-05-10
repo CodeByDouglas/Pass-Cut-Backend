@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt 
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_servicos import validar_token_consultar_servico
+from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 
 consultar_servicos_bp = Blueprint('consultar_servicos', __name__)
 
@@ -14,6 +16,13 @@ def consultar_servicos():
         if (verificar_token_fernet(auth) and 
             verificar_token_jwt(token_estabelecimento) and 
             verificar_token_jwt(token_user)):
-            return jsonify({"message": "Requisição bem sucedida"}), 200
-    
+            # Chama as funções de validação adicionais
+            if validar_token_consultar_servico(auth):
+                valid_est, estabelecimento_id = validar_token_id_estabelecimento(token_estabelecimento)
+                if valid_est:
+                    return jsonify({
+                        "message": "Requisição bem sucedida",
+                        "estabelecimento_id": estabelecimento_id
+                    }), 200
+                    
     return jsonify({"erro": "Autenticação falhou"}), 401
