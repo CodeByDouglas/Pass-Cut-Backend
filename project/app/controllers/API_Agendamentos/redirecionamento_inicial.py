@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_Inicial import validar_token_redirecionamento_inicial
+from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_Inicial import validar_token_redirecionamento_inicial
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDBase import verificar_id_base
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Nome_Estabelecimento import verificar_nome_estabelecimento

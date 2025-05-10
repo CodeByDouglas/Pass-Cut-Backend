@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
-from ...services.Services_Agendamentos.Validar_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
+from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
 from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
