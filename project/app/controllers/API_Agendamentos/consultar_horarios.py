@@ -18,25 +18,46 @@ def consultar_horarios():
         if (verificar_token_fernet(auth) and 
             verificar_token_jwt(token_estabelecimento) and 
             verificar_token_jwt(token_user)):
-            # Chama as funções de validação adicionais
             if validar_token_consultar_horarios(auth):
-                valid_est, estabelecimento_id = validar_token_id_estabelecimento(token_estabelecimento)
-                if valid_est:
-                    valid_user = validar_token_id_user(estabelecimento_id, token_user)
-                    if valid_user:
-                        _, user_id = valid_user
-                        return jsonify({
-                            "message": "Requisição bem sucedida",
-                            "estabelecimento_id": estabelecimento_id,
-                            "user_id": user_id
-                        }), 200
-                    else:
-                        return jsonify({"erro": "Autenticação falhou erro no user"}), 401
+                result_est = validar_token_id_estabelecimento(token_estabelecimento)
+                if isinstance(result_est, tuple):
+                    valid_est, estabelecimento_id = result_est
                 else:
-                    return jsonify({"erro": "Autenticação falhou erro ao validar token estabelecinento "}), 401
-            else: 
-                return jsonify({"erro": "Autenticação falhou erro no user validando token da api"}), 401
-        else: 
-            return jsonify({"erro": "Autenticação falhou erro no user  verificando se são tokens"}), 401
+                    valid_est = result_est
+                    estabelecimento_id = None
+                    
+                if valid_est and estabelecimento_id:
+                    valid_user = validar_token_id_user(estabelecimento_id, token_user)
+                    if isinstance(valid_user, tuple):
+                        _, user_id = valid_user
+                    else:
+                        return jsonify({"erro": "Autenticação falhou - erro no user"}), 401
+
+                    # Verifica se no corpo da requisição foram enviados os dados necessários:
+                    # - Um array com os IDs do serviço
+                    # - O ID do colaborador
+                    # - Uma data
+                    req_data = request.get_json()
+                    if req_data and isinstance(req_data, dict):
+                        servicos = req_data.get('servicos')
+                        colaborador_id = req_data.get('colaborador-id')
+                        data_agendamento = req_data.get('data')
+                        if (servicos and isinstance(servicos, list) and 
+                            colaborador_id and data_agendamento):
+                            return jsonify({
+                                "message": "Requisição bem sucedida",
+                                "estabelecimento_id": estabelecimento_id,
+                                "user_id": user_id,
+                                "servicos": servicos,
+                                "colaborador_id": colaborador_id,
+                                "data": data_agendamento
+                            }), 200
+                    return jsonify({"erro": "Dados insuficientes"}), 400
+                else:
+                    return jsonify({"erro": "Autenticação falhou - erro ao validar token estabelecimento"}), 401
+            else:
+                return jsonify({"erro": "Autenticação falhou - erro no token da API"}), 401
+        else:
+            return jsonify({"erro": "Autenticação falhou - erro na verificação dos tokens"}), 401
     else:
-        return jsonify({"erro": "Autenticação falhou erro no user não foram nem encontrados"}), 401
+        return jsonify({"erro": "Autenticação falhou - cabeçalhos não encontrados"}), 401
