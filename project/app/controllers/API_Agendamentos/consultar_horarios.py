@@ -4,6 +4,9 @@ from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT imp
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_horarios import validar_token_consultar_horarios
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ...services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
 
 consultar_horarios_bp = Blueprint('consultar_horarios', __name__)
 
@@ -33,10 +36,7 @@ def consultar_horarios():
                     else:
                         return jsonify({"erro": "Autenticação falhou - erro no user"}), 401
 
-                    # Verifica se no corpo da requisição foram enviados os dados necessários:
-                    # - Um array com os IDs do serviço
-                    # - O ID do colaborador
-                    # - Uma data
+                    # Recupera os dados do corpo da requisição
                     req_data = request.get_json()
                     if req_data and isinstance(req_data, dict):
                         servicos = req_data.get('servicos')
@@ -44,6 +44,18 @@ def consultar_horarios():
                         data_agendamento = req_data.get('data')
                         if (servicos and isinstance(servicos, list) and 
                             colaborador_id and data_agendamento):
+                            
+                            # Verifica individualmente cada parâmetro:
+                            if not verificar_id_colaborador(colaborador_id):
+                                return jsonify({"erro": "Dados invalidos: colaborador_id inválido"}), 400
+                            
+                            if not verificar_data(data_agendamento):
+                                return jsonify({"erro": "Dados invalidos: data inválida"}), 400
+                            
+                            if not verificar_ids_servicos(servicos):
+                                return jsonify({"erro": "Dados invalidos: ids de serviço inválidos"}), 400
+                            
+                            # Todas as validações passaram
                             return jsonify({
                                 "message": "Requisição bem sucedida",
                                 "estabelecimento_id": estabelecimento_id,
