@@ -4,16 +4,16 @@ from cryptography.fernet import Fernet
 
 load_dotenv()
 
-def validar_token_alterar_status_agendamento(token: str) -> bool:
+def validar_token_cancelar_agendamento(token: str) -> bool:
     """
-    Descriptografa o token usando a chave CHAVE_API_ALTERAR_STATUS_AGENDAMENTOS do .env e compara
-    com o token esperado, definido em TOKEN_API_ALTERAR_STATUS_AGENDAMENTOS.
+    Descriptografa o token usando a chave CHAVE_API_CANCELAR_AGENDAMENTO do .env e compara
+    com o token esperado, definido em TOKEN_API_CANCELAR_AGENDAMENTO.
     
     Returns:
         bool: True se os tokens coincidirem, False caso contrário.
     """
-    chave = os.getenv("CHAVE_API_ALTERAR_STATUS_AGENDAMENTOS")
-    expected_token = os.getenv("TOKEN_API_ALTERAR_STATUS_AGENDAMENTOS")
+    chave = os.getenv("CHAVE_API_CANCELAR_AGENDAMENTO")
+    expected_token = os.getenv("TOKEN_API_CANCELAR_AGENDAMENTO")
     
     if not (chave and expected_token):
         return False

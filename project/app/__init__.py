@@ -9,7 +9,7 @@ from .controllers.API_Agendamentos.consultar_agendamentos import consultar_agend
 from .controllers.API_Agendamentos.consultar_servicos import consultar_servicos_bp
 from .controllers.API_Agendamentos.consultar_colaborador import consultar_colaborador_bp
 from .controllers.API_Agendamentos.consultar_horarios import consultar_horarios_bp
-from .controllers.API_Agendamentos.alterar_status_agendamentos import alterar_status_agendamentos_bp
+from .controllers.API_Agendamentos.cancelar_agendamento import cancelar_agendamento_bp
 
 
 def create_app(config_class=Config):
@@ -33,6 +33,6 @@ def create_app(config_class=Config):
     app.register_blueprint(consultar_servicos_bp)
     app.register_blueprint(consultar_colaborador_bp)
     app.register_blueprint(consultar_horarios_bp)
-    app.register_blueprint(alterar_status_agendamentos_bp)
+    app.register_blueprint(cancelar_agendamento_bp)
 
     return app
