@@ -29,10 +29,18 @@ def alterar_status_agendamentos():
                     valid_user = validar_token_id_user(estabelecimento_id, token_user)
                     if isinstance(valid_user, tuple):
                         _, user_id = valid_user
-                        return jsonify({"message": "Requisição bem sucedida"}), 200
+                        
+                        # Verifica se o corpo da requisição contém os parâmetros "agendamento_id" e "status"
+                        req_data = request.get_json()
+                        if req_data and isinstance(req_data, dict):
+                            agendamento_id = req_data.get('agendamento_id')
+                            status = req_data.get('status')
+                            if agendamento_id and status:
+                                return jsonify({"message": "Requisição bem sucedida"}), 200
+                            else:
+                                return jsonify({"erro": "Dados insuficientes"}), 411
+                        else:
+                            return jsonify({"erro": "Dados insuficientes"}), 411
                     else:
                         return jsonify({"erro": "Autenticação falhou - erro no user"}), 401
-                    
-
-                    
     return jsonify({"erro": "Autenticação falhou"}), 401
