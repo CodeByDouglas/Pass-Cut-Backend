@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from app.extensions import db
-
+from sqlalchemy import Time
 # Tabela de associação para muitos-para-muitos entre Agendamento e Serviço
 agendamento_servico = db.Table(
     'agendamento_servico',
@@ -27,7 +27,76 @@ class BaseModel(db.Model):
     )
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
+class Funcionamento(BaseModel):
+    __tablename__ = 'funcionamentos'
 
+    estabelecimento_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey('estabelecimentos.id'),
+        nullable=False,
+        index=True
+    )
+
+    # Menor intervalo em minutos
+    menor_time = db.Column(db.Integer, default=10, nullable=False)
+
+    # Horários de expediente por dia
+    seg_inicio = db.Column(Time, nullable=True)
+    seg_fim    = db.Column(Time, nullable=True)
+    ter_inicio = db.Column(Time, nullable=True)
+    ter_fim    = db.Column(Time, nullable=True)
+    qua_inicio = db.Column(Time, nullable=True)
+    qua_fim    = db.Column(Time, nullable=True)
+    qui_inicio = db.Column(Time, nullable=True)
+    qui_fim    = db.Column(Time, nullable=True)
+    sex_inicio = db.Column(Time, nullable=True)
+    sex_fim    = db.Column(Time, nullable=True)
+    sab_inicio = db.Column(Time, nullable=True)
+    sab_fim    = db.Column(Time, nullable=True)
+    dom_inicio = db.Column(Time, nullable=True)
+    dom_fim    = db.Column(Time, nullable=True)
+
+    # Relacionamento com estabelecimento
+    estabelecimento = db.relationship(
+        'Estabelecimento',
+        backref='funcionamento',
+        lazy=True
+    )
+
+class Horario(BaseModel):
+    __tablename__ = 'horarios'
+
+    # FK para estabelecimento e colaborador
+    estabelecimento_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey('estabelecimentos.id'),
+        nullable=False,
+        index=True
+    )
+    colaborador_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey('colaboradores.id'),
+        nullable=False,
+        index=True
+    )
+
+    # A data do agendamento (ex: 2025-03-20)
+    data = db.Column(db.Date, nullable=False)
+
+    # Array de horários (por exemplo: ['08:00', '09:30', '11:00', …])
+    horarios = db.Column(ARRAY(Time), nullable=False)
+
+    # Relacionamentos para facilitar consultas
+    estabelecimento = db.relationship(
+        'Estabelecimento',
+        backref='horarios',
+        lazy=True
+    )
+    colaborador = db.relationship(
+        'Colaborador',
+        backref='horarios',
+        lazy=True
+    )
 # Estabelecimento (com login e senha)
 class Estabelecimento(BaseModel):
     __tablename__ = 'estabelecimentos'
