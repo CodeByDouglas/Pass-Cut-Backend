@@ -4,6 +4,10 @@ from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT imp
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_criar_agendamento import validar_token_consultar_servico
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ...services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_horarios import verificar_horario_valido
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
+from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
 
 criar_agendamento_bp = Blueprint('criar_agendamento', __name__)
 
@@ -25,11 +29,30 @@ def criar_agendamento():
                     resultado_user = validar_token_id_user(estabelecimento_id, token_user)
                     if isinstance(resultado_user, tuple) and resultado_user[0]:
                         _, user_id = resultado_user
-                        return jsonify({
-                            "message": "Agendamento criado com sucesso",
-                            "estabelecimento_id": estabelecimento_id,
-                            "user_id": user_id
-                        }), 200
+
+                        # Verificação dos dados no corpo da requisição
+                        dados = request.get_json()
+                        colaborador_id = dados.get('colaborador_id') if dados else None
+                        horario = dados.get('horario') if dados else None
+                        data = dados.get('data') if dados else None
+                        servicos = dados.get('servicos') if dados else None
+
+                        if colaborador_id and horario and data and servicos and isinstance(servicos, list) and len(servicos) > 0:
+                            if (
+                                verificar_id_colaborador(colaborador_id)
+                                and verificar_horario_valido(horario)
+                                and verificar_data(data)
+                                and verificar_ids_servicos(servicos)
+                            ):
+                                return jsonify({
+                                    "message": "Agendamento criado com sucesso",
+                                    "estabelecimento_id": estabelecimento_id,
+                                    "user_id": user_id
+                                }), 200
+                            else:
+                                return jsonify({"erro": "Dados invalidos"}), 400
+                        else:
+                            return jsonify({"erro": "Dados insuficientes para a consulta"}), 400
                     else:
                         return jsonify({"erro": "Erro de autenticação"}), 401
                 else:
