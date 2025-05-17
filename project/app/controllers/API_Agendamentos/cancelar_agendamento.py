@@ -5,6 +5,7 @@ from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_cancela
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
 from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
 from ...services.Services_Agendamentos.Verificacao_Dados.verificacao_IDAgendamento import verificar_id_agendamento
+from ...services.Services_Agendamentos.Consulta_DataBase.Cancelar_agendamento import cancelar_agendamento_db
 
 cancelar_agendamento_bp = Blueprint('cancelar_agendamento', __name__)
 
@@ -38,7 +39,10 @@ def cancelar_agendamento():
                             if agendamento_id:
                                 # Verifica se o agendamento_id segue o padrão esperado
                                 if verificar_id_agendamento(agendamento_id):
-                                    return jsonify({"message": "Requisição bem sucedida"}), 200
+                                    if cancelar_agendamento_db(agendamento_id, estabelecimento_id, user_id):
+                                        return jsonify({"message": "Agendamento cancelado com sucesso"}), 200
+                                    else:
+                                        return jsonify({"erro": "Não foi possível cancelar o agendamento. Erro interno."}), 500
                                 else:
                                     return jsonify({"erro": "Dados invalidos: agendamento_id inválido"}), 400
                             else:

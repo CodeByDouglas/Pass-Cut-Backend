@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from app.extensions import db
 from sqlalchemy import Time
+from app.extensions import db
+
 # Tabela de associação para muitos-para-muitos entre Agendamento e Serviço
 agendamento_servico = db.Table(
     'agendamento_servico',
@@ -10,22 +11,29 @@ agendamento_servico = db.Table(
     db.Column('servico_id', UUID(as_uuid=True), db.ForeignKey('servicos.id'), primary_key=True)
 )
 
-# BaseModel com UUID, timestamps e soft-delete
 default_datetime = datetime.utcnow
+
 
 class BaseModel(db.Model):
     __abstract__ = True
 
     id = db.Column(
-        UUID(as_uuid=True), primary_key=True,
-        default=uuid.uuid4, nullable=False, unique=True, index=True
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        nullable=False,
+        unique=True,
+        index=True
     )
     created_at = db.Column(db.DateTime, default=default_datetime, nullable=False)
     updated_at = db.Column(
-        db.DateTime, default=default_datetime,
-        onupdate=default_datetime, nullable=False
+        db.DateTime,
+        default=default_datetime,
+        onupdate=default_datetime,
+        nullable=False
     )
     deleted = db.Column(db.Boolean, default=False, nullable=False)
+
 
 class Funcionamento(BaseModel):
     __tablename__ = 'funcionamentos'
@@ -36,11 +44,8 @@ class Funcionamento(BaseModel):
         nullable=False,
         index=True
     )
-
-    # Menor intervalo em minutos
     menor_time = db.Column(db.Integer, default=10, nullable=False)
 
-    # Horários de expediente por dia
     seg_inicio = db.Column(Time, nullable=True)
     seg_fim    = db.Column(Time, nullable=True)
     ter_inicio = db.Column(Time, nullable=True)
@@ -56,100 +61,82 @@ class Funcionamento(BaseModel):
     dom_inicio = db.Column(Time, nullable=True)
     dom_fim    = db.Column(Time, nullable=True)
 
-    # Relacionamento com estabelecimento
     estabelecimento = db.relationship(
-        'Estabelecimento',
-        backref='funcionamento',
-        lazy=True
+        'Estabelecimento', backref='funcionamento', lazy=True
     )
+
 
 class Horario(BaseModel):
     __tablename__ = 'horarios'
 
-    # FK para estabelecimento e colaborador
     estabelecimento_id = db.Column(
-        UUID(as_uuid=True),
-        db.ForeignKey('estabelecimentos.id'),
-        nullable=False,
-        index=True
+        UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False, index=True
     )
     colaborador_id = db.Column(
-        UUID(as_uuid=True),
-        db.ForeignKey('colaboradores.id'),
-        nullable=False,
-        index=True
+        UUID(as_uuid=True), db.ForeignKey('colaboradores.id'), nullable=False, index=True
     )
-
-    # A data do agendamento (ex: 2025-03-20)
     data = db.Column(db.Date, nullable=False)
-
-    # Array de horários (por exemplo: ['08:00', '09:30', '11:00', …])
     horarios = db.Column(ARRAY(Time), nullable=False)
 
-    # Relacionamentos para facilitar consultas
     estabelecimento = db.relationship(
-        'Estabelecimento',
-        backref='horarios',
-        lazy=True
+        'Estabelecimento', backref='horarios', lazy=True
     )
     colaborador = db.relationship(
-        'Colaborador',
-        backref='horarios',
-        lazy=True
+        'Colaborador', backref='horarios', lazy=True
     )
-# Estabelecimento (com login e senha)
+
+    # Relacionamento: um Horario → muitos Agendamentos
+    agendamentos = db.relationship(
+        'Agendamento', back_populates='horario', lazy=True
+    )
+
+    horario_inicial = db.Column(Time, nullable=True)
+    horario_final = db.Column(Time, nullable=True)
+    menor_time = db.Column(
+        db.Integer,        # importa e usa o tipo Integer
+        default=10,        # valor padrão (opcional)
+        nullable=False     # força valor não-nulo
+    )
+
+
 class Estabelecimento(BaseModel):
     __tablename__ = 'estabelecimentos'
 
-    #Número da Base para redirecionamento inicial
-    identificador_base = db.Column(db.String(10), nullable=False,  unique=True, index=True)
-    # credenciais de acesso
+    identificador_base = db.Column(db.String(10), nullable=False, unique=True, index=True)
     email_login = db.Column(db.String(100), nullable=False, unique=True)
     senha_hash = db.Column(db.String(128), nullable=False)
-
-    # dados cadastrais e Pagar.me
     nome_fantasia = db.Column(db.String(100), nullable=False)
     cnpj = db.Column(db.String(20), nullable=True, unique=True)
     telefone = db.Column(db.String(20), nullable=True)
     pagarme_recipient_id = db.Column(db.String(50), nullable=True, unique=True)
 
-    # relacionamentos
     colaboradores = db.relationship('Colaborador', backref='estabelecimento', lazy=True)
     planos = db.relationship('Plano', backref='estabelecimento', lazy=True)
     clientes = db.relationship('Cliente', backref='estabelecimento', lazy=True)
     agendamentos = db.relationship('Agendamento', backref='estabelecimento', lazy=True)
 
 
-# Cliente (com login e senha)
 class Cliente(BaseModel):
     __tablename__ = 'clientes'
 
-    # credenciais de acesso
     email_login = db.Column(db.String(100), nullable=False, unique=True)
     senha_hash = db.Column(db.String(128), nullable=False)
-
-    # dados pessoais
     nome = db.Column(db.String(100), nullable=False)
     cpf = db.Column(db.String(14), nullable=True, unique=True)
     telefone = db.Column(db.String(20), nullable=True)
 
-    # integração Pagar.me
     pagarme_customer_id = db.Column(db.String(50), nullable=True, unique=True)
     card_token = db.Column(db.String(100), nullable=True)
     card_last_digits = db.Column(db.String(4), nullable=True)
     card_brand = db.Column(db.String(20), nullable=True)
 
-    # relacionamento com estabelecimento (tenant)
     estabelecimento_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False
     )
-
-    # relacionamentos
     assinaturas = db.relationship('Assinatura', backref='cliente', lazy=True)
     agendamentos = db.relationship('Agendamento', backref='cliente', lazy=True)
 
 
-# Colaborador mínimo
 class Colaborador(BaseModel):
     __tablename__ = 'colaboradores'
 
@@ -157,8 +144,6 @@ class Colaborador(BaseModel):
     estabelecimento_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False
     )
-
-    # relacionamento de agendamentos
     agendamentos = db.relationship('Agendamento', backref='colaborador', lazy=True)
 
 
@@ -169,21 +154,19 @@ class Servico(BaseModel):
     __tablename__ = 'servicos'
 
     nome = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.Text, nullable=True)  # novo campo de texto
-    duracao = db.Column(db.Integer, nullable=False)  # em minutos
+    descricao = db.Column(db.Text, nullable=True)
+    duracao = db.Column(db.Integer, nullable=False)
     preco = db.Column(default_numeric, nullable=False)
     ativo = db.Column(db.Boolean, default=True, nullable=False)
 
     estabelecimento_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey('estabelecimentos.id'), nullable=False
     )
+    agendamentos = db.relationship(
+        'Agendamento', secondary=agendamento_servico, back_populates='servicos', lazy=True
+    )
 
-    # Relacionamento muitos-para-muitos com Agendamento
-    agendamentos = db.relationship('Agendamento', secondary=agendamento_servico, back_populates='servicos',lazy=True)
 
-
-
-# Plano de assinatura
 class Plano(BaseModel):
     __tablename__ = 'planos'
 
@@ -199,7 +182,6 @@ class Plano(BaseModel):
     assinaturas = db.relationship('Assinatura', backref='plano', lazy=True)
 
 
-# Assinatura de plano por cliente
 class Assinatura(BaseModel):
     __tablename__ = 'assinaturas'
 
@@ -213,11 +195,9 @@ class Assinatura(BaseModel):
     status = db.Column(db.String(20), default='ativa', nullable=False)
     pagarme_subscription_id = db.Column(db.String(50), nullable=True, unique=True)
 
-    # relacionamento com agendamentos (opcional)
     agendamentos = db.relationship('Agendamento', backref='assinatura', lazy=True)
 
 
-# Agendamento (reserva de horário)
 class Agendamento(BaseModel):
     __tablename__ = 'agendamentos'
 
@@ -234,9 +214,19 @@ class Agendamento(BaseModel):
         UUID(as_uuid=True), db.ForeignKey('assinaturas.id'), nullable=True
     )
 
+    # FK: referência ao Horario
+    horario_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey('horarios.id'), nullable=True, index=True
+    )
+    horario = db.relationship('Horario', back_populates='agendamentos', lazy=True)
+
+    # Separação de data e hora: data e múltiplos horários
+    data = db.Column(db.Date, nullable=False)
+    horas = db.Column(ARRAY(Time), nullable=False)
+
     duracao = db.Column(db.Integer, nullable=False)
-    data_hora = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='pendente', nullable=False)
 
-    # Relacionamento muitos-para-muitos com Servico
-    servicos = db.relationship('Servico', secondary=agendamento_servico, back_populates='agendamentos', lazy=True)
+    servicos = db.relationship(
+        'Servico', secondary=agendamento_servico, back_populates='agendamentos', lazy=True
+    )
