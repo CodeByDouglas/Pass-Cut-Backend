@@ -22,4 +22,4 @@ def gerar_token(chave: str, dado: str) -> str:
     # Retorna o token como string
     return token.decode()
 
-gerar_token("vivJxX4LAZWHds9JfSKibTUT_lEBhURv1M3sTDUzKJQ=","gvtWure4Hm337b9cxULiA4p8lX8z7hJfyrpHvzdIRAeJITlTW7oehYg1x69Kn3BNVpIWCH4eQGyyX2SUNlbV4qR7THKXB5YDMrwv")
+gerar_token("","")
