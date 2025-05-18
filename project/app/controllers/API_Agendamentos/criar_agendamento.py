@@ -8,6 +8,7 @@ from ...services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_horarios import verificar_horario_valido
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
 from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
+from ...services.Services_Agendamentos.Consulta_DataBase.Criar_agendamento import agendar
 
 criar_agendamento_bp = Blueprint('criar_agendamento', __name__)
 
@@ -44,11 +45,23 @@ def criar_agendamento():
                                 and verificar_data(data)
                                 and verificar_ids_servicos(servicos)
                             ):
-                                return jsonify({
-                                    "message": "Agendamento criado com sucesso",
-                                    "estabelecimento_id": estabelecimento_id,
-                                    "user_id": user_id
-                                }), 200
+                                resultado = agendar(estabelecimento_id, user_id, servicos, colaborador_id, data, horario)
+                                if resultado is True:
+                                    return jsonify({
+                                        "message": "Agendamento criado com sucesso",
+                                        "estabelecimento_id": estabelecimento_id,
+                                        "user_id": user_id
+                                    }), 200
+                                elif isinstance(resultado, tuple) and resultado[0] is False:
+                                    mensagem = resultado[1]
+                                    if mensagem == "Erro interno":
+                                        return jsonify({"erro": "Erro interno ao processar o agendamento"}), 500
+                                    elif mensagem == "Horário indisponível":
+                                        return jsonify({"message": "Infelizmente o horário solicitado acabou de ser preenchido e não está mais disponível."}), 204
+                                    else:
+                                        return jsonify({"erro": mensagem}), 400
+                                else:
+                                    return jsonify({"erro": "Erro desconhecido"}), 500
                             else:
                                 return jsonify({"erro": "Dados invalidos"}), 400
                         else:
