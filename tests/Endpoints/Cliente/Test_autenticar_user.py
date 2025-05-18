@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.autenticar_user import autenticar_user_bp
+from project.app.controllers.Endpoints.Cliente.autenticar_user import autenticar_user_bp
 
 # Arquivo de testes para o endpoint de autenticação de usuários
 
@@ -36,15 +36,15 @@ def test_autenticar_user_success(client):
     - Um token JWT é gerado corretamente
     """
     # Configura todos os mocks necessários para simular um fluxo de autenticação bem-sucedido
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_autenticar_user', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_email', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_senha', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.consultar_id_user', return_value=(True, "456")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.autenticar_senha', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.gerar_jwt_id_estabelecimento', return_value="mock-jwt-token"):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_autenticar_user', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_email', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_senha', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.consultar_id_user', return_value=(True, "456")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.autenticar_senha', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.gerar_jwt_id_estabelecimento', return_value="mock-jwt-token"):
         
         # Prepara os dados para o teste: cabeçalhos com tokens válidos
         headers = {
@@ -95,7 +95,7 @@ def test_autenticar_user_invalid_tokens(client):
     verificando se o endpoint rejeita corretamente a requisição
     """
     # Simula a verificação do token Fernet retornando falso (token inválido)
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=False):
         headers = {
             'Authorization': 'invalid-token',
             'token-estabelecimento': 'some-token'
@@ -114,10 +114,10 @@ def test_autenticar_user_missing_credentials(client):
     não contém os campos de login e senha necessários
     """
     # Configura os mocks para simular tokens válidos
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_autenticar_user', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_autenticar_user', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")):
         
         # Prepara cabeçalhos válidos
         headers = {
@@ -142,11 +142,11 @@ def test_autenticar_user_invalid_email(client):
     fornecido tem um formato inválido
     """
     # Configura os mocks para simular tokens válidos, mas email inválido
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_autenticar_user', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_email', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_autenticar_user', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_email', return_value=False):
         
         # Prepara cabeçalhos válidos
         headers = {
@@ -176,13 +176,13 @@ def test_autenticar_user_user_not_found(client):
     no banco de dados, mesmo com email e senha em formato válido
     """
     # Configura os mocks para simular usuário não encontrado
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_autenticar_user', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_email', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_senha', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.consultar_id_user', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_autenticar_user', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_email', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_senha', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.consultar_id_user', return_value=False):
         
         # Prepara cabeçalhos válidos
         headers = {
@@ -212,14 +212,14 @@ def test_autenticar_user_wrong_password(client):
     mas a senha fornecida não corresponde à senha armazenada
     """
     # Configura os mocks para simular senha incorreta
-    with patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_autenticar_user', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_email', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.verificar_senha', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.consultar_id_user', return_value=(True, "456")), \
-         patch('project.app.controllers.API_Agendamentos.autenticar_user.autenticar_senha', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_autenticar_user', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.validar_token_id_estabelecimento', return_value=(True, "123")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_email', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.verificar_senha', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.consultar_id_user', return_value=(True, "456")), \
+         patch('project.app.controllers.Endpoints.Cliente.autenticar_user.autenticar_senha', return_value=False):
         
         # Prepara cabeçalhos válidos
         headers = {

@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.consultar_colaborador import consultar_colaborador_bp
-
-# filepath: project/app/controllers/API_Agendamentos/test_consultar_colaborador.py
+from project.app.controllers.Endpoints.Cliente.consultar_colaborador import consultar_colaborador_bp
 
 # Importa o blueprint do controller que será testado
 # Usando import absoluto conforme a estrutura do projeto e as diretrizes
@@ -37,12 +35,12 @@ def test_consultar_colaborador_sucesso_com_colaboradores(client):
     Espera-se uma resposta 200 OK com a lista de colaboradores.
     """
     # Mock das funções de serviço para simular um cenário de sucesso
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True) as mock_ver_fernet, \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True) as mock_ver_jwt, \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True) as mock_val_token_colab, \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")) as mock_val_id_est, \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")) as mock_val_id_user, \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(True, [{"id": 1, "nome": "Colaborador Alfa"}, {"id": 2, "nome": "Colaborador Beta"}])) as mock_cons_colab:
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True) as mock_ver_fernet, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True) as mock_ver_jwt, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True) as mock_val_token_colab, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")) as mock_val_id_est, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")) as mock_val_id_user, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(True, [{"id": 1, "nome": "Colaborador Alfa"}, {"id": 2, "nome": "Colaborador Beta"}])) as mock_cons_colab:
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -65,7 +63,6 @@ def test_consultar_colaborador_sucesso_com_colaboradores(client):
         assert len(data['servicos']) == 2
         assert data['servicos'][0]['nome'] == "Colaborador Alfa"
 
-
         # Verifica se os mocks foram chamados como esperado
         mock_ver_fernet.assert_called_once_with('valid-fernet-token')
         assert mock_ver_jwt.call_count == 2 # Chamado para token-estabelecimento e token-user
@@ -80,12 +77,12 @@ def test_consultar_colaborador_sucesso_sem_colaboradores_cadastrados(client):
     mas o estabelecimento não possui colaboradores cadastrados (lista vazia).
     Espera-se uma resposta 200 OK com uma lista de 'servicos' (colaboradores) vazia.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(True, [])): # Lista de colaboradores vazia
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(True, [])): # Lista de colaboradores vazia
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -107,12 +104,12 @@ def test_consultar_colaborador_falha_consulta_db(client):
     (retorna (False, ...)).
     Espera-se uma resposta 404 Not Found.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(False, [])): # Falha na consulta
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=(False, [])): # Falha na consulta
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -130,12 +127,12 @@ def test_consultar_colaborador_falha_consulta_db_retorna_none(client):
     Testa o cenário onde a consulta ao banco de dados por colaboradores retorna None.
     Espera-se uma resposta 404 Not Found.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=None): # Consulta retorna None
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_user', return_value=(True, "user_id_101")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.consultar_colaboradores_por_estabelecimento', return_value=None): # Consulta retorna None
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -166,14 +163,16 @@ def test_consultar_colaborador_cabecalho_ausente(client, missing_header):
     response = client.post('/consultar-colaborador', headers=headers)
     assert response.status_code == 401
     data = json.loads(response.data)
-    assert data['erro'] == "Autenticação falhou"
+    assert data == {
+        "erro": "Autenticação falhou"
+    }
 
 def test_consultar_colaborador_token_fernet_invalido(client):
     """
     Testa a falha quando o token Fernet ('auth') é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=False):
         headers = {
             'auth': 'invalid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -182,15 +181,17 @@ def test_consultar_colaborador_token_fernet_invalido(client):
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }
 
 def test_consultar_colaborador_token_jwt_estabelecimento_invalido(client):
     """
     Testa a falha quando o token JWT do estabelecimento é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', side_effect=[False, True]): # Primeiro JWT (est) é inválido
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', side_effect=[False, True]): # Primeiro JWT (est) é inválido
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'invalid-jwt-est-token',
@@ -199,15 +200,17 @@ def test_consultar_colaborador_token_jwt_estabelecimento_invalido(client):
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }
 
 def test_consultar_colaborador_token_jwt_user_invalido(client):
     """
     Testa a falha quando o token JWT do usuário é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', side_effect=[True, False]): # Segundo JWT (user) é inválido
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', side_effect=[True, False]): # Segundo JWT (user) é inválido
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -216,16 +219,18 @@ def test_consultar_colaborador_token_jwt_user_invalido(client):
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }
 
 def test_consultar_colaborador_token_auth_nao_valido_para_colaborador(client):
     """
     Testa a falha quando o token 'auth' não é válido para a consulta de colaboradores.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=False): # Token auth inválido para colaborador
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=False): # Token auth inválido para colaborador
         headers = {
             'auth': 'valid-fernet-token-but-not-for-colab',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -234,7 +239,9 @@ def test_consultar_colaborador_token_auth_nao_valido_para_colaborador(client):
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }
 
 @pytest.mark.parametrize("id_est_return_val", [False, (True, None), (False, None)])
 def test_consultar_colaborador_token_id_estabelecimento_invalido(client, id_est_return_val):
@@ -243,10 +250,10 @@ def test_consultar_colaborador_token_id_estabelecimento_invalido(client, id_est_
     (validar_token_id_estabelecimento retorna False, (True, None) ou (False, None)).
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=id_est_return_val): # Validação do ID do estabelecimento falha
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=id_est_return_val): # Validação do ID do estabelecimento falha
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token-invalid-id',
@@ -255,7 +262,9 @@ def test_consultar_colaborador_token_id_estabelecimento_invalido(client, id_est_
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }
 
 
 def test_consultar_colaborador_token_id_user_invalido_nao_tupla(client):
@@ -264,11 +273,11 @@ def test_consultar_colaborador_token_id_user_invalido_nao_tupla(client):
     (validar_token_id_user retorna um valor que não é uma tupla, ex: False).
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_colaborador.validar_token_id_user', return_value=False): # Validação do ID do usuário falha (não é tupla)
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_consultar_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_estabelecimento', return_value=(True, "est_id_789")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_colaborador.validar_token_id_user', return_value=False): # Validação do ID do usuário falha (não é tupla)
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -277,4 +286,6 @@ def test_consultar_colaborador_token_id_user_invalido_nao_tupla(client):
         response = client.post('/consultar-colaborador', headers=headers)
         assert response.status_code == 401
         data = json.loads(response.data)
-        assert data['erro'] == "Autenticação falhou"
+        assert data == {
+            "erro": "Autenticação falhou"
+        }

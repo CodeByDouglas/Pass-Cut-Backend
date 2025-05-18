@@ -2,9 +2,7 @@ import pytest
 from unittest.mock import patch
 from flask import Flask, json
 import datetime
-from project.app.controllers.API_Agendamentos.consultar_horarios import consultar_horarios_bp
-
-# filepath: project/app/controllers/API_Agendamentos/test_consultar_horarios.py
+from project.app.controllers.Endpoints.Cliente.consultar_horarios import consultar_horarios_bp
 
 # Importa o blueprint do controller que será testado
 
@@ -37,15 +35,15 @@ def test_consultar_horarios_sucesso_com_horarios(client):
     Espera-se uma resposta 200 OK com a lista de horários formatados.
     """
     horarios_mock = [datetime.time(9, 0), datetime.time(10, 30), datetime.time(14, 15)]
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True) as mock_v_fernet, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True) as mock_v_jwt, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True) as mock_v_token_hor, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id_abc")) as mock_v_id_est, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id_xyz")) as mock_v_id_user, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=True) as mock_v_id_colab, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_data', return_value=True) as mock_v_data, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_ids_servicos', return_value=True) as mock_v_ids_serv, \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.consultar_horarios_agendamento', return_value=(True, horarios_mock)) as mock_cons_hor:
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True) as mock_v_fernet, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True) as mock_v_jwt, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True) as mock_v_token_hor, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id_abc")) as mock_v_id_est, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id_xyz")) as mock_v_id_user, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=True) as mock_v_id_colab, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_data', return_value=True) as mock_v_data, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_ids_servicos', return_value=True) as mock_v_ids_serv, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.consultar_horarios_agendamento', return_value=(True, horarios_mock)) as mock_cons_hor:
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -83,15 +81,15 @@ def test_consultar_horarios_sucesso_nenhum_horario_disponivel(client):
     mas não há horários disponíveis (retorna [None]).
     Espera-se uma resposta 200 OK com a mensagem apropriada.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id_abc")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id_xyz")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_data', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_ids_servicos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.consultar_horarios_agendamento', return_value=(True, [None])):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id_abc")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id_xyz")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_data', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_ids_servicos', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.consultar_horarios_agendamento', return_value=(True, [None])):
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -133,7 +131,7 @@ def test_consultar_horarios_token_fernet_invalido(client):
     Testa a falha quando o token Fernet ('auth') é inválido.
     Espera-se uma resposta 401 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=False):
         headers = {'auth': 'invalid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "d1"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -147,8 +145,8 @@ def test_consultar_horarios_token_jwt_invalido(client, jwt_est_valid, jwt_user_v
     Testa a falha quando um dos tokens JWT é inválido.
     Espera-se uma resposta 401 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', side_effect=[jwt_est_valid, jwt_user_valid]):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', side_effect=[jwt_est_valid, jwt_user_valid]):
         headers = {'auth': 'valid', 'token-estabelecimento': 'jwt1', 'token-user': 'jwt2'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "d1"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -161,9 +159,9 @@ def test_consultar_horarios_token_api_invalido(client):
     Testa a falha quando o token 'auth' não é válido para consultar horários.
     Espera-se uma resposta 401 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=False):
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "d1"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -177,10 +175,10 @@ def test_consultar_horarios_token_id_estabelecimento_invalido(client, id_est_ret
     Testa a falha quando a validação do token do estabelecimento falha.
     Espera-se uma resposta 401 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=id_est_return_val):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=id_est_return_val):
         headers = {'auth': 'valid', 'token-estabelecimento': 'invalid_est_token', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "d1"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -193,11 +191,11 @@ def test_consultar_horarios_token_id_user_invalido(client):
     Testa a falha quando a validação do token do usuário falha (não retorna tupla).
     Espera-se uma resposta 401 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=False): # Falha na validação do user
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=False): # Falha na validação do user
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'invalid_user_token'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "d1"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -219,11 +217,11 @@ def test_consultar_horarios_dados_insuficientes_payload(client, bad_payload, exp
     Testa a falha quando o payload JSON é inválido ou dados obrigatórios estão ausentes.
     Espera-se uma resposta 400 com mensagem "Dados insuficientes".
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")):
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         
         if bad_payload is None:
@@ -241,12 +239,12 @@ def test_consultar_horarios_id_colaborador_invalido(client):
     Testa a falha quando 'colaborador-id' é inválido.
     Espera-se uma resposta 400 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=False): # ID Colaborador inválido
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=False): # ID Colaborador inválido
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "invalid_colab", 'data': "2024-01-01"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -259,13 +257,13 @@ def test_consultar_horarios_data_invalida(client):
     Testa a falha quando 'data' é inválida.
     Espera-se uma resposta 400 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_data', return_value=False): # Data inválida
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_data', return_value=False): # Data inválida
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "invalid_date"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -278,14 +276,14 @@ def test_consultar_horarios_ids_servicos_invalidos(client):
     Testa a falha quando 'servicos' contém IDs inválidos.
     Espera-se uma resposta 400 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_data', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_ids_servicos', return_value=False): # IDs de serviço inválidos
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_data', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_ids_servicos', return_value=False): # IDs de serviço inválidos
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["invalid_serv"], 'colaborador-id': "c1", 'data': "2024-01-01"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)
@@ -298,15 +296,15 @@ def test_consultar_horarios_erro_interno_consulta_db(client):
     Testa a falha quando a consulta ao banco de dados (consultar_horarios_agendamento) retorna False.
     Espera-se uma resposta 501 com mensagem específica.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_id_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_data', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.verificar_ids_servicos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_horarios.consultar_horarios_agendamento', return_value=False): # Erro na consulta DB
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_consultar_horarios', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_id_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_data', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.verificar_ids_servicos', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_horarios.consultar_horarios_agendamento', return_value=False): # Erro na consulta DB
         headers = {'auth': 'valid', 'token-estabelecimento': 'valid', 'token-user': 'valid'}
         payload = {'servicos': ["s1"], 'colaborador-id': "c1", 'data': "2024-01-01"}
         response = client.post('/consultar-horarios', headers=headers, json=payload)

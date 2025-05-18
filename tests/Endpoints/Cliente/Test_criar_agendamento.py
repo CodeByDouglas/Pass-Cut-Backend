@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.criar_agendamento import criar_agendamento_bp
-
-# filepath: project/app/controllers/API_Agendamentos/test_criar_agendamento.py
+from project.app.controllers.Endpoints.Cliente.criar_agendamento import criar_agendamento_bp
 
 # Importa o blueprint do controller que será testado
 
@@ -36,16 +34,16 @@ def test_criar_agendamento_sucesso(client):
     e a função 'agendar' retorna True.
     Espera-se uma resposta 200 OK.
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True) as mock_v_fernet, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True) as mock_v_jwt, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True) as mock_v_token_serv, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_1")) as mock_v_id_est, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_user', return_value=(True, "user_id_1")) as mock_v_id_user, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_id_colaborador', return_value=True) as mock_v_id_colab, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_horario_valido', return_value=True) as mock_v_horario, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_data', return_value=True) as mock_v_data, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_ids_servicos', return_value=True) as mock_v_ids_serv, \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.agendar', return_value=True) as mock_agendar:
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True) as mock_v_fernet, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True) as mock_v_jwt, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True) as mock_v_token_serv, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_1")) as mock_v_id_est, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_user', return_value=(True, "user_id_1")) as mock_v_id_user, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_id_colaborador', return_value=True) as mock_v_id_colab, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_horario_valido', return_value=True) as mock_v_horario, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_data', return_value=True) as mock_v_data, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_ids_servicos', return_value=True) as mock_v_ids_serv, \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.agendar', return_value=True) as mock_agendar:
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -98,9 +96,9 @@ def test_criar_agendamento_cabecalho_ausente(client, missing_header):
     assert data['erro'] == "Erro de autenticação" # Mensagem genérica do último else
 
 @pytest.mark.parametrize("mock_config", [
-    {'target': 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', 'return_value': False},
-    {'target': 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', 'side_effect': [False, True]}, # token_user falha
-    {'target': 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', 'side_effect': [True, False]}, # token_estabelecimento falha
+    {'target': 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', 'return_value': False},
+    {'target': 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', 'side_effect': [False, True]}, # token_user falha
+    {'target': 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', 'side_effect': [True, False]}, # token_estabelecimento falha
 ])
 def test_criar_agendamento_falha_verificacao_token_inicial(client, mock_config):
     """
@@ -112,10 +110,10 @@ def test_criar_agendamento_falha_verificacao_token_inicial(client, mock_config):
         # ou que o side_effect cubra todas as chamadas de verificar_token_jwt.
         # Para simplificar, se o target é verificar_token_jwt, o verificar_token_fernet é True.
         # Se o target é verificar_token_fernet, o verificar_token_jwt é True (ou não é chamado).
-        patch_fernet = patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True)
-        patch_jwt = patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True)
+        patch_fernet = patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True)
+        patch_jwt = patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True)
 
-        if mock_config['target'] == 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet':
+        if mock_config['target'] == 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet':
             patch_jwt.start()
         else: # mock_config['target'] is verificar_token_jwt
             patch_fernet.start()
@@ -125,7 +123,7 @@ def test_criar_agendamento_falha_verificacao_token_inicial(client, mock_config):
         payload = {'colaborador_id': 'c1', 'horario': 'h1', 'data': 'd1', 'servicos': ['s1']}
         response = client.post('/criar-agendamento', headers=headers, json=payload)
         
-        if mock_config['target'] == 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet':
+        if mock_config['target'] == 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet':
             patch_jwt.stop()
         else:
             patch_fernet.stop()
@@ -140,9 +138,9 @@ def test_criar_agendamento_falha_validar_token_servico(client):
     Testa a falha quando validar_token_consultar_servico (token de API) retorna False.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=False):
         headers = {'auth': 't1', 'token-estabelecimento': 't2', 'token-user': 't3'}
         payload = {'colaborador_id': 'c1', 'horario': 'h1', 'data': 'd1', 'servicos': ['s1']}
         response = client.post('/criar-agendamento', headers=headers, json=payload)
@@ -156,10 +154,10 @@ def test_criar_agendamento_falha_validar_token_id_estabelecimento(client, id_est
     Testa a falha quando validar_token_id_estabelecimento retorna um valor inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=id_est_return_val):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=id_est_return_val):
         headers = {'auth': 't1', 'token-estabelecimento': 't2', 'token-user': 't3'}
         payload = {'colaborador_id': 'c1', 'horario': 'h1', 'data': 'd1', 'servicos': ['s1']}
         response = client.post('/criar-agendamento', headers=headers, json=payload)
@@ -173,11 +171,11 @@ def test_criar_agendamento_falha_validar_token_id_user(client, id_user_return_va
     Testa a falha quando validar_token_id_user retorna um valor inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_user', return_value=id_user_return_val):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_user', return_value=id_user_return_val):
         headers = {'auth': 't1', 'token-estabelecimento': 't2', 'token-user': 't3'}
         payload = {'colaborador_id': 'c1', 'horario': 'h1', 'data': 'd1', 'servicos': ['s1']}
         response = client.post('/criar-agendamento', headers=headers, json=payload)
@@ -200,11 +198,11 @@ def test_criar_agendamento_dados_insuficientes_payload(client, bad_payload):
     Testa a falha quando o payload JSON é inválido ou dados obrigatórios estão ausentes.
     Espera-se uma resposta 400 com "Dados insuficientes para a consulta".
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")):
         headers = {'auth': 't1', 'token-estabelecimento': 't2', 'token-user': 't3'}
         
         if bad_payload is None:
@@ -218,25 +216,25 @@ def test_criar_agendamento_dados_insuficientes_payload(client, bad_payload):
         assert data['erro'] == "Dados insuficientes para a consulta"
 
 @pytest.mark.parametrize("validation_function_to_fail", [
-    'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_id_colaborador',
-    'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_horario_valido',
-    'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_data',
-    'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_ids_servicos',
+    'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_id_colaborador',
+    'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_horario_valido',
+    'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_data',
+    'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_ids_servicos',
 ])
 def test_criar_agendamento_falha_validacao_dados(client, validation_function_to_fail):
     """
     Testa a falha quando uma das funções de validação de dados (colaborador, horario, data, servicos) retorna False.
     Espera-se uma resposta 400 com "Dados invalidos".
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_id_colaborador', return_value=validation_function_to_fail != 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_id_colaborador'), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_horario_valido', return_value=validation_function_to_fail != 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_horario_valido'), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_data', return_value=validation_function_to_fail != 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_data'), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_ids_servicos', return_value=validation_function_to_fail != 'project.app.controllers.API_Agendamentos.criar_agendamento.verificar_ids_servicos'):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_id_colaborador', return_value=validation_function_to_fail != 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_id_colaborador'), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_horario_valido', return_value=validation_function_to_fail != 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_horario_valido'), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_data', return_value=validation_function_to_fail != 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_data'), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_ids_servicos', return_value=validation_function_to_fail != 'project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_ids_servicos'):
 
         # Garante que a função específica que está sendo testada para falhar retorne False
         patch(validation_function_to_fail, return_value=False).start()
@@ -262,16 +260,16 @@ def test_criar_agendamento_falhas_funcao_agendar(client, agendar_return, expecte
     """
     Testa diferentes cenários de falha da função 'agendar'.
     """
-    with patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_id_colaborador', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_horario_valido', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_data', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.verificar_ids_servicos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.criar_agendamento.agendar', return_value=agendar_return):
+    with patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.validar_token_id_user', return_value=(True, "user_id")), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_id_colaborador', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_horario_valido', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_data', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.verificar_ids_servicos', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.criar_agendamento.agendar', return_value=agendar_return):
 
         headers = {'auth': 't1', 'token-estabelecimento': 't2', 'token-user': 't3'}
         payload = {'colaborador_id': 'c1', 'horario': 'h1', 'data': 'd1', 'servicos': ['s1']}

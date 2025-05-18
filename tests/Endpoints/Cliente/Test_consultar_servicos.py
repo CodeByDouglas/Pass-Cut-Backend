@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.consultar_servicos import consultar_servicos_bp
-
-# filepath: project/app/controllers/API_Agendamentos/test_consultar_servicos.py
+from project.app.controllers.Endpoints.Cliente.consultar_servicos import consultar_servicos_bp
 
 # Importa o blueprint do controller que será testado
 # Usando import absoluto conforme a estrutura do projeto e as diretrizes
@@ -36,12 +34,12 @@ def test_consultar_servicos_sucesso_com_servicos(client):
     Espera-se uma resposta 200 OK com a lista de serviços.
     """
     # Mock das funções de serviço para simular um cenário de sucesso
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True) as mock_ver_fernet, \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True) as mock_ver_jwt, \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True) as mock_val_token_serv, \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")) as mock_val_id_est, \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")) as mock_val_id_user, \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(True, [{"id": 1, "nome": "Corte"}, {"id": 2, "nome": "Barba"}])) as mock_cons_serv:
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True) as mock_ver_fernet, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True) as mock_ver_jwt, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True) as mock_val_token_serv, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")) as mock_val_id_est, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")) as mock_val_id_user, \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(True, [{"id": 1, "nome": "Corte"}, {"id": 2, "nome": "Barba"}])) as mock_cons_serv:
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -72,12 +70,12 @@ def test_consultar_servicos_sucesso_sem_servicos_cadastrados(client):
     mas o estabelecimento não possui serviços cadastrados (lista vazia).
     Espera-se uma resposta 200 OK com uma lista de serviços vazia.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(True, [])): # Lista de serviços vazia
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(True, [])): # Lista de serviços vazia
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -99,12 +97,12 @@ def test_consultar_servicos_falha_consulta_db(client):
     (retorna (False, ...)).
     Espera-se uma resposta 404 Not Found.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(False, [])): # Falha na consulta
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=(False, [])): # Falha na consulta
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -122,12 +120,12 @@ def test_consultar_servicos_falha_consulta_db_retorna_none(client):
     Testa o cenário onde a consulta ao banco de dados por serviços retorna None.
     Espera-se uma resposta 404 Not Found.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=None): # Consulta retorna None
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_user', return_value=(True, "user_id_456")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.consultar_servicos_por_estabelecimento', return_value=None): # Consulta retorna None
 
         headers = {
             'auth': 'valid-fernet-token',
@@ -165,7 +163,7 @@ def test_consultar_servicos_token_fernet_invalido(client):
     Testa a falha quando o token Fernet ('auth') é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=False):
         headers = {
             'auth': 'invalid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -181,8 +179,8 @@ def test_consultar_servicos_token_jwt_estabelecimento_invalido(client):
     Testa a falha quando o token JWT do estabelecimento é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', side_effect=[False, True]): # Primeiro JWT (est) é inválido
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', side_effect=[False, True]): # Primeiro JWT (est) é inválido
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'invalid-jwt-est-token',
@@ -198,8 +196,8 @@ def test_consultar_servicos_token_jwt_user_invalido(client):
     Testa a falha quando o token JWT do usuário é inválido.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', side_effect=[True, False]): # Segundo JWT (user) é inválido
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', side_effect=[True, False]): # Segundo JWT (user) é inválido
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -215,9 +213,9 @@ def test_consultar_servicos_token_auth_nao_valido_para_servico(client):
     Testa a falha quando o token 'auth' não é válido para a consulta de serviços.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=False): # Token auth inválido para serviço
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=False): # Token auth inválido para serviço
         headers = {
             'auth': 'valid-fernet-token-but-not-for-service',
             'token-estabelecimento': 'valid-jwt-est-token',
@@ -234,10 +232,10 @@ def test_consultar_servicos_token_id_estabelecimento_invalido(client):
     (validar_token_id_estabelecimento retorna False ou (False, ...)).
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=False): # Validação do ID do estabelecimento falha
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=False): # Validação do ID do estabelecimento falha
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token-invalid-id',
@@ -254,10 +252,10 @@ def test_consultar_servicos_token_id_estabelecimento_retorna_true_none(client):
     o que invalida a condição 'if valid_est and estabelecimento_id'.
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, None)): # ID do estabelecimento é None
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, None)): # ID do estabelecimento é None
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token-id-none',
@@ -274,11 +272,11 @@ def test_consultar_servicos_token_id_user_invalido_nao_tupla(client):
     (validar_token_id_user retorna um valor que não é uma tupla, ex: False).
     Espera-se uma resposta 401 Unauthorized.
     """
-    with patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_consultar_servico', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_servicos.validar_token_id_user', return_value=False): # Validação do ID do usuário falha (não é tupla)
+    with patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_consultar_servico', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.consultar_servicos.validar_token_id_user', return_value=False): # Validação do ID do usuário falha (não é tupla)
         headers = {
             'auth': 'valid-fernet-token',
             'token-estabelecimento': 'valid-jwt-est-token',

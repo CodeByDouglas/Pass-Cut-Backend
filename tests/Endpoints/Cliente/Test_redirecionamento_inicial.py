@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.redirecionamento_inicial import redirecionamento_bp
-
-# filepath: /workspaces/Pass-Cut-Backend/tests/Tests_Endpoints/test_redirecionamento_inicial.py
+from project.app.controllers.Endpoints.Cliente.redirecionamento_inicial import redirecionamento_bp
 
 # Arquivo de testes para o endpoint de redirecionamento inicial
 
@@ -37,12 +35,12 @@ def test_redirecionamento_inicial_success(client):
     - Um token JWT é gerado corretamente
     """
     # Configura todos os mocks necessários para simular um fluxo de redirecionamento bem-sucedido
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_id_base', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_nome_estabelecimento', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.consultar_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.gerar_jwt_id_estabelecimento', return_value="mock-jwt-token"):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_id_base', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_nome_estabelecimento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.consultar_estabelecimento', return_value=(True, "123")), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.gerar_jwt_id_estabelecimento', return_value="mock-jwt-token"):
         
         # Prepara os dados para o teste: cabeçalho com token válido
         headers = {
@@ -92,7 +90,7 @@ def test_redirecionamento_inicial_invalid_fernet_token(client):
     fornecido não é um token Fernet válido
     """
     # Simula a verificação do token Fernet retornando falso (token inválido)
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=False):
         headers = {
             'Authorization': 'invalid-token'
         }
@@ -115,8 +113,8 @@ def test_redirecionamento_inicial_invalid_redirection_token(client):
     não é válido para o propósito específico de redirecionamento
     """
     # Simula um token Fernet válido, mas inválido para redirecionamento
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=False):
         
         headers = {
             'Authorization': 'valid-fernet-but-invalid-redirect-token'
@@ -139,8 +137,8 @@ def test_redirecionamento_inicial_missing_json(client):
     os dados necessários no corpo da requisição
     """
     # Configura os mocks para simular token válido
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True):
     
         # Prepara cabeçalho válido
         headers = {
@@ -164,8 +162,8 @@ def test_redirecionamento_inicial_incomplete_data(client):
     dos campos necessários nos dados fornecidos
     """
     # Configura os mocks para simular token válido
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True):
         
         # Prepara cabeçalho válido
         headers = {
@@ -194,9 +192,9 @@ def test_redirecionamento_inicial_invalid_data_format(client):
     do ID base ou do nome do estabelecimento é inválido
     """
     # Configura os mocks para simular token válido mas dados com formato inválido
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_id_base', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_id_base', return_value=False):
         
         # Prepara cabeçalho válido
         headers = {
@@ -225,11 +223,11 @@ def test_redirecionamento_inicial_establishment_not_found(client):
     mas o estabelecimento não existe no banco de dados
     """
     # Configura os mocks para simular estabelecimento não encontrado
-    with patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_id_base', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.verificar_nome_estabelecimento', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.redirecionamento_inicial.consultar_estabelecimento', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.validar_token_redirecionamento_inicial', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_id_base', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.verificar_nome_estabelecimento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.redirecionamento_inicial.consultar_estabelecimento', return_value=False):
         
         # Prepara cabeçalho válido
         headers = {

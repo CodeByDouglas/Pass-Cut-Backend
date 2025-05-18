@@ -1,310 +1,264 @@
 import pytest
 from unittest.mock import patch
 from flask import Flask, json
-from project.app.controllers.API_Agendamentos.consultar_agendamentos import consultar_agendamentos_bp
-
-# filepath: /workspaces/Pass-Cut-Backend/tests/Endpoints/Agendamentos/Test_consultar_agendamentos.py
-
-# Documentação: Testes para o endpoint de consulta de agendamentos
-# Este arquivo contém testes que verificam o funcionamento do endpoint
-# /api/consultar_agendamentos, cobrindo cenários de sucesso e falha.
+from project.app.controllers.Endpoints.Cliente.cancelar_agendamento import cancelar_agendamento_bp
 
 @pytest.fixture
 def app():
     """
-    Fixture que cria uma instância da aplicação Flask para testes
+    Fixture que cria e configura uma instância da aplicação Flask para os testes.
+    Registra o blueprint 'cancelar_agendamento_bp' e ativa o modo de teste.
     """
     app = Flask(__name__)
-    app.register_blueprint(consultar_agendamentos_bp)
+    app.register_blueprint(cancelar_agendamento_bp) # Rota base definida no blueprint
     app.config['TESTING'] = True
+    app.config['DEBUG'] = False # Desabilitar debug para não interferir nos testes de erro
     return app
 
 @pytest.fixture
 def client(app):
     """
-    Fixture que cria um cliente de teste para fazer requisições à aplicação
+    Fixture que cria um cliente de teste para fazer requisições HTTP à aplicação.
+    Utiliza a aplicação Flask configurada pela fixture 'app'.
     """
     return app.test_client()
 
-def test_consultar_agendamentos_sucesso(client):
+# --- Testes para o endpoint /cancelar-agendamento ---
+
+def test_cancelar_agendamento_sucesso(client):
     """
-    Teste para o cenário de sucesso na consulta de agendamentos
-    
-    Verifica se o endpoint retorna os agendamentos corretamente quando
-    todos os parâmetros são válidos e existem agendamentos para o usuário.
+    Testa o cancelamento de agendamento bem-sucedido.
+    Todos os tokens são válidos, 'agendamento_id' é fornecido e válido,
+    e o cancelamento no banco de dados ocorre com sucesso.
+    Espera-se uma resposta 200 OK.
     """
-    # Configura todos os mocks necessários para simular sucesso
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_user', return_value=(True, "456")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.consultar_agendamentos_por_estabelecimento_cliente_status', 
-               return_value=[{"id": 1, "data": "2023-06-01", "hora": "14:00", "servico": "Corte de Cabelo"}]):
-        
-        # Configura cabeçalhos e dados para a requisição
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True) as mock_ver_fernet, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True) as mock_ver_jwt, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True) as mock_val_token_cancel, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_123")) as mock_val_id_est, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_user', return_value=(True, "user_id_456")) as mock_val_id_user, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_id_agendamento', return_value=True) as mock_ver_id_ag, \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.cancelar_agendamento_db', return_value=True) as mock_cancel_db:
+
         headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token'
         }
-        data = {
-            'type': 'ativos'
-        }
-        
-        # Faz a requisição GET (que na verdade precisa de um body, então é meio híbrida)
-        response = client.get('/api/consultar_agendamentos', 
-                             headers=headers,
-                             json=data)
-        
-        # Verifica a resposta
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
+
         assert response.status_code == 200
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "success"
-        assert response_data["message"] == "Consulta realizada com sucesso."
-        assert isinstance(response_data["agendamentos"], list)
-        assert len(response_data["agendamentos"]) == 1
-        assert response_data["agendamentos"][0]["id"] == 1
+        data = json.loads(response.data)
+        assert data['message'] == "Agendamento cancelado com sucesso"
 
-def test_consultar_agendamentos_sem_resultados(client):
-    """
-    Teste para o cenário onde não há agendamentos para o usuário
-    
-    Verifica se o endpoint retorna uma mensagem adequada quando
-    não existem agendamentos para o usuário com os parâmetros informados.
-    """
-    # Configura mocks para simular o caso de nenhum agendamento encontrado
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_user', return_value=(True, "456")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.consultar_agendamentos_por_estabelecimento_cliente_status', 
-               return_value=None):
-        
-        headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
-        }
-        data = {
-            'type': 'historico'
-        }
-        
-        response = client.get('/api/consultar_agendamentos', 
-                             headers=headers,
-                             json=data)
-        
-        assert response.status_code == 200
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "success"
-        assert response_data["message"] == "Nenhum agendamento encontrado para os dados informados."
-        assert "agendamentos" not in response_data
+        # Verifica se os mocks foram chamados
+        mock_ver_fernet.assert_called_once_with('valid-fernet-token')
+        assert mock_ver_jwt.call_count == 2
+        mock_val_token_cancel.assert_called_once_with('valid-fernet-token')
+        mock_val_id_est.assert_called_once_with('valid-jwt-est-token')
+        mock_val_id_user.assert_called_once_with("est_id_123", 'valid-jwt-user-token')
+        mock_ver_id_ag.assert_called_once_with('ag_12345')
+        mock_cancel_db.assert_called_once_with('ag_12345', "est_id_123", "user_id_456")
 
-def test_consultar_agendamentos_sem_headers(client):
+@pytest.mark.parametrize("missing_header", ["auth", "token-estabelecimento", "token-user"])
+def test_cancelar_agendamento_cabecalho_ausente(client, missing_header):
     """
-    Teste para o cenário onde os cabeçalhos de autorização estão ausentes
-    
-    Verifica se o endpoint rejeita a requisição quando não são fornecidos
-    os cabeçalhos de autorização necessários.
+    Testa a falha quando um dos cabeçalhos obrigatórios está ausente.
+    Espera-se uma resposta 401 Unauthorized.
     """
-    # Teste sem enviar nenhum header
-    response = client.get('/api/consultar_agendamentos')
-    
-    assert response.status_code == 401
-    response_data = json.loads(response.data)
-    assert response_data["status"] == "error"
-    assert response_data["message"] == "Erro de autenticação"
-
-def test_consultar_agendamentos_headers_incompletos(client):
-    """
-    Teste para o cenário onde alguns cabeçalhos de autorização estão ausentes
-    
-    Verifica se o endpoint rejeita a requisição quando apenas alguns dos
-    cabeçalhos necessários são fornecidos.
-    """
-    # Teste enviando apenas o header Authorization
     headers = {
-        'Authorization': 'token-fernet-valido'
+        'auth': 'valid-fernet-token',
+        'token-estabelecimento': 'valid-jwt-est-token',
+        'token-user': 'valid-jwt-user-token'
     }
-    response = client.get('/api/consultar_agendamentos', headers=headers)
-    
+    del headers[missing_header]
+    payload = {'agendamento_id': 'ag_12345'}
+
+    response = client.post('/cancelar-agendamento', headers=headers, json=payload)
     assert response.status_code == 401
-    response_data = json.loads(response.data)
-    assert response_data["status"] == "error"
-    assert response_data["message"] == "Erro de autenticação"
+    data = json.loads(response.data)
+    assert data == {
+        "erro": "Autenticação falhou"
+    }
 
-def test_consultar_agendamentos_token_formato_invalido(client):
+def test_cancelar_agendamento_token_fernet_invalido(client):
     """
-    Teste para o cenário onde os tokens têm formato inválido
-    
-    Verifica se o endpoint rejeita a requisição quando os tokens
-    fornecidos não têm o formato correto.
+    Testa a falha quando o token Fernet ('auth') é inválido.
+    Espera-se uma resposta 401 Unauthorized.
     """
-    # Configura mock para simular token Fernet inválido
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=False):
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=False):
         headers = {
-            'Authorization': 'token-fernet-invalido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
+            'auth': 'invalid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token'
         }
-        response = client.get('/api/consultar_agendamentos', headers=headers)
-        
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 401
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de autenticação"
-
-    # Configura mock para simular token JWT inválido
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=False):
-        headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-invalido',
-            'token-user': 'token-jwt-usuario'
+        data = json.loads(response.data)
+        assert data == {
+            "erro": "Autenticação falhou"
         }
-        response = client.get('/api/consultar_agendamentos', headers=headers)
-        
+
+@pytest.mark.parametrize("jwt_est_valid, jwt_user_valid", [(False, True), (True, False)])
+def test_cancelar_agendamento_token_jwt_invalido(client, jwt_est_valid, jwt_user_valid):
+    """
+    Testa a falha quando um dos tokens JWT é inválido.
+    Espera-se uma resposta 401 Unauthorized.
+    """
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', side_effect=[jwt_est_valid, jwt_user_valid]):
+        headers = {
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'jwt-est-token',
+            'token-user': 'jwt-user-token'
+        }
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 401
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de autenticação"
-
-def test_consultar_agendamentos_token_autorizacao_invalido(client):
-    """
-    Teste para o cenário onde o token de autorização é inválido para consulta
-    
-    Verifica se o endpoint rejeita a requisição quando o token de autorização
-    não é válido especificamente para consulta de agendamentos.
-    """
-    # Configura mocks para simular token de autorização inválido para consulta
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=False):
-        
-        headers = {
-            'Authorization': 'token-fernet-valido-mas-nao-para-consulta',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
+        data = json.loads(response.data)
+        assert data == {
+            "erro": "Autenticação falhou"
         }
-        response = client.get('/api/consultar_agendamentos', headers=headers)
-        
+
+def test_cancelar_agendamento_token_auth_nao_valido_para_cancelar(client):
+    """
+    Testa a falha quando o token 'auth' não é válido para cancelamento.
+    Espera-se uma resposta 401 Unauthorized.
+    """
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=False):
+        headers = {
+            'auth': 'valid-fernet-token-but-not-for-cancel',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token'
+        }
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 401
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de autenticação"
-
-def test_consultar_agendamentos_token_estabelecimento_invalido(client):
-    """
-    Teste para o cenário onde o token do estabelecimento é inválido
-    
-    Verifica se o endpoint rejeita a requisição quando o token do
-    estabelecimento não é válido.
-    """
-    # Configura mocks para simular token de estabelecimento inválido
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=False):
-        
-        headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento-invalido',
-            'token-user': 'token-jwt-usuario'
+        data = json.loads(response.data)
+        assert data == {
+            "erro": "Autenticação falhou"
         }
-        response = client.get('/api/consultar_agendamentos', headers=headers)
-        
+
+@pytest.mark.parametrize("id_est_return_val", [False, (True, None), (False, None)])
+def test_cancelar_agendamento_token_id_estabelecimento_invalido(client, id_est_return_val):
+    """
+    Testa a falha quando a validação do token do estabelecimento falha.
+    Casos: retorna False, (True, None), (False, None).
+    Espera-se uma resposta 401 Unauthorized.
+    """
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=id_est_return_val):
+        headers = {
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token-invalid-id',
+            'token-user': 'valid-jwt-user-token'
+        }
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 401
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de autenticação"
-
-def test_consultar_agendamentos_token_usuario_invalido(client):
-    """
-    Teste para o cenário onde o token do usuário é inválido
-    
-    Verifica se o endpoint rejeita a requisição quando o token do
-    usuário não é válido para o estabelecimento.
-    """
-    # Configura mocks para simular token de usuário inválido
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_user', return_value=False):
-        
-        headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario-invalido'
+        data = json.loads(response.data)
+        assert data == {
+            "erro": "Autenticação falhou"
         }
-        response = client.get('/api/consultar_agendamentos', headers=headers)
-        
+
+
+def test_cancelar_agendamento_token_id_user_invalido(client):
+    """
+    Testa a falha quando a validação do token do usuário falha (não retorna tupla).
+    Espera-se uma resposta 401 Unauthorized com mensagem específica "erro no user".
+    """
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_user', return_value=False):
+        headers = {
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token-invalid-id'
+        }
+        payload = {'agendamento_id': 'ag_12345'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 401
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de autenticação"
+        data = json.loads(response.data)
+        assert data == {
+            "erro": "Autenticação falhou - erro no user"
+        }
 
-def test_consultar_agendamentos_sem_parametro_tipo(client):
-    """
-    Teste para o cenário onde o parâmetro de tipo está ausente
-    
-    Verifica se o endpoint rejeita a requisição quando o parâmetro
-    'type' não é fornecido no corpo da requisição.
-    """
-    # Configura mocks para simular validação bem-sucedida até o ponto de verificar o parâmetro type
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_user', return_value=(True, "456")):
-        
-        headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
-        }
-        # Não envia o parâmetro 'type'
-        data = {}
-        
-        response = client.get('/api/consultar_agendamentos', 
-                             headers=headers,
-                             json=data)
-        
-        assert response.status_code == 411
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Erro de dados insuficientes"
+@pytest.mark.parametrize("bad_payload", [None, [], {}, {"other_key": "value"}, {"agendamento_id": None}, {"agendamento_id": ""}])
+def test_cancelar_agendamento_dados_insuficientes_ou_invalidos_payload(client, bad_payload):
+        """
+        Testa a falha quando o payload JSON é inválido, não é um dicionário,
+        ou 'agendamento_id' está ausente/vazio.
+        Espera-se uma resposta 411 "Dados insuficientes".
+        """
+        with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+             patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+             patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True), \
+             patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+             patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_user', return_value=(True, "user_id_456")):
+            headers = {
+                'auth': 'valid-fernet-token',
+                'token-estabelecimento': 'valid-jwt-est-token',
+                'token-user': 'valid-jwt-user-token'
+            }
+            if bad_payload is None:
+                # Envia a string JSON "null" para simular um payload JSON nulo
+                response = client.post('/cancelar-agendamento', headers=headers, data='null', content_type='application/json')
+            else:
+                response = client.post('/cancelar-agendamento', headers=headers, json=bad_payload)
+            
+            assert response.status_code == 411
+            data = json.loads(response.data)
+            assert data['erro'] == "Dados insuficientes"
 
-def test_consultar_agendamentos_tipo_invalido(client):
+def test_cancelar_agendamento_id_agendamento_formato_invalido(client):
     """
-    Teste para o cenário onde o parâmetro de tipo tem valor inválido
-    
-    Verifica se o endpoint rejeita a requisição quando o valor
-    do parâmetro 'type' não é 'ativos' nem 'historico'.
+    Testa a falha quando 'agendamento_id' tem um formato inválido.
+    Espera-se uma resposta 400 "Dados invalidos: agendamento_id inválido".
     """
-    # Configura mocks para simular validação bem-sucedida até o ponto de verificar o valor do parâmetro type
-    with patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_fernet', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.verificar_token_jwt', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_consultar_agendamentos', return_value=True), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_estabelecimento', return_value=(True, "123")), \
-         patch('project.app.controllers.API_Agendamentos.consultar_agendamentos.validar_token_id_user', return_value=(True, "456")):
-        
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_user', return_value=(True, "user_id_456")), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_id_agendamento', return_value=False):
         headers = {
-            'Authorization': 'token-fernet-valido',
-            'token-estabelecimento': 'token-jwt-estabelecimento',
-            'token-user': 'token-jwt-usuario'
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token'
         }
-        # Envia um tipo inválido
-        data = {
-            'type': 'invalido'
-        }
-        
-        response = client.get('/api/consultar_agendamentos', 
-                             headers=headers,
-                             json=data)
-        
+        payload = {'agendamento_id': 'formato_invalido_id'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
         assert response.status_code == 400
-        response_data = json.loads(response.data)
-        assert response_data["status"] == "error"
-        assert response_data["message"] == "Dados invalidos"
+        data = json.loads(response.data)
+        assert data['erro'] == "Dados invalidos: agendamento_id inválido"
+
+def test_cancelar_agendamento_falha_no_banco(client):
+    """
+    Testa a falha quando o cancelamento no banco de dados (cancelar_agendamento_db) retorna False.
+    Espera-se uma resposta 500 "Erro interno".
+    """
+    with patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_fernet', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_token_jwt', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_cancelar_agendamento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_estabelecimento', return_value=(True, "est_id_123")), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.validar_token_id_user', return_value=(True, "user_id_456")), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.verificar_id_agendamento', return_value=True), \
+         patch('project.app.controllers.Endpoints.Cliente.cancelar_agendamento.cancelar_agendamento_db', return_value=False):
+        headers = {
+            'auth': 'valid-fernet-token',
+            'token-estabelecimento': 'valid-jwt-est-token',
+            'token-user': 'valid-jwt-user-token'
+        }
+        payload = {'agendamento_id': 'ag_12345_db_fail'}
+        response = client.post('/cancelar-agendamento', headers=headers, json=payload)
+        assert response.status_code == 500
+        data = json.loads(response.data)
+        assert data['erro'] == "Não foi possível cancelar o agendamento. Erro interno."
