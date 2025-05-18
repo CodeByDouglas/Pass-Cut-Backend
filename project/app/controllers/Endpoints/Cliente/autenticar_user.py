@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
-from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
-from ...services.Services_Agendamentos.Hashe_senha.Autendicar_senha import autenticar_senha
-from ...services.Services_Agendamentos.Gerar_Token_JWT.Gerar_JWT_IDUser import gerar_jwt_id_estabelecimento
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_email import verificar_email
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_senha import verificar_senha
+from ....services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
+from ....services.Services_Agendamentos.Hashe_senha.Autendicar_senha import autenticar_senha
+from ....services.Services_Agendamentos.Gerar_Token_JWT.Gerar_JWT_IDUser import gerar_jwt_id_estabelecimento
 
 autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/autenticar_user')
 

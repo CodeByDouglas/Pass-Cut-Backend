@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_cancelar_agendamento import validar_token_cancelar_agendamento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ...services.Services_Agendamentos.Verificacao_Dados.verificacao_IDAgendamento import verificar_id_agendamento
-from ...services.Services_Agendamentos.Consulta_DataBase.Cancelar_agendamento import cancelar_agendamento_db
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_cancelar_agendamento import validar_token_cancelar_agendamento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Services_Agendamentos.Verificacao_Dados.verificacao_IDAgendamento import verificar_id_agendamento
+from ....services.Services_Agendamentos.Consulta_DataBase.Cancelar_agendamento import cancelar_agendamento_db
 
 cancelar_agendamento_bp = Blueprint('cancelar_agendamento', __name__)
 

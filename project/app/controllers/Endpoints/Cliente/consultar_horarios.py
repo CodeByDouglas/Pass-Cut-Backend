@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_horarios import validar_token_consultar_horarios
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ...services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
-from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_horario import consultar_horarios_agendamento
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_horarios import validar_token_consultar_horarios
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
+from ....services.Services_Agendamentos.Consulta_DataBase.Consultar_horario import consultar_horarios_agendamento
 
 consultar_horarios_bp = Blueprint('consultar_horarios', __name__)
 

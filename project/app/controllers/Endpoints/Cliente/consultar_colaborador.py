@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_colaboradores import validar_token_consultar_colaborador
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ...services.Services_Agendamentos.Consulta_DataBase.Consulta_colaboradores import consultar_colaboradores_por_estabelecimento
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_colaboradores import validar_token_consultar_colaborador
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Services_Agendamentos.Consulta_DataBase.Consulta_colaboradores import consultar_colaboradores_por_estabelecimento
 
 consultar_colaborador_bp = Blueprint('consultar_colaborador', __name__)
 

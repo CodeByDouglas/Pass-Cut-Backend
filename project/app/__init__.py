@@ -3,14 +3,14 @@ from flask import Flask
 from dotenv import load_dotenv
 from .config import Config
 from .extensions import db, migrate, jwt, cors
-from .controllers.API_Agendamentos.redirecionamento_inicial import redirecionamento_bp
-from .controllers.API_Agendamentos.autenticar_user import autenticar_user_bp
-from .controllers.API_Agendamentos.consultar_agendamentos import consultar_agendamentos_bp
-from .controllers.API_Agendamentos.consultar_servicos import consultar_servicos_bp
-from .controllers.API_Agendamentos.consultar_colaborador import consultar_colaborador_bp
-from .controllers.API_Agendamentos.consultar_horarios import consultar_horarios_bp
-from .controllers.API_Agendamentos.cancelar_agendamento import cancelar_agendamento_bp
-from .controllers.API_Agendamentos.criar_agendamento import criar_agendamento_bp
+from .controllers.Endpoints.Cliente.redirecionamento_inicial import redirecionamento_bp
+from .controllers.Endpoints.Cliente.autenticar_user import autenticar_user_bp
+from .controllers.Endpoints.Cliente.consultar_agendamentos import consultar_agendamentos_bp
+from .controllers.Endpoints.Cliente.consultar_servicos import consultar_servicos_bp
+from .controllers.Endpoints.Cliente.consultar_colaborador import consultar_colaborador_bp
+from .controllers.Endpoints.Cliente.consultar_horarios import consultar_horarios_bp
+from .controllers.Endpoints.Cliente.cancelar_agendamento import cancelar_agendamento_bp
+from .controllers.Endpoints.Cliente.criar_agendamento import criar_agendamento_bp
 
 
 def create_app(config_class=Config):

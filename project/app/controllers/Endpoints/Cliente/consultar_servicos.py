@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_servicos import validar_token_consultar_servico
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ...services.Services_Agendamentos.Consulta_DataBase.Consultar_servicos import consultar_servicos_por_estabelecimento
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_consultar_servicos import validar_token_consultar_servico
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Services_Agendamentos.Consulta_DataBase.Consultar_servicos import consultar_servicos_por_estabelecimento
 
 consultar_servicos_bp = Blueprint('consultar_servicos', __name__)
 

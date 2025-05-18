@@ -1,14 +1,14 @@
 from flask import Blueprint, request, jsonify
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_criar_agendamento import validar_token_consultar_servico
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ...services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ...services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificar_horarios import verificar_horario_valido
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
-from ...services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
-from ...services.Services_Agendamentos.Consulta_DataBase.Criar_agendamento import agendar
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_Fernet import verificar_token_fernet
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_Token_JWT import verificar_token_jwt
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_criar_agendamento import validar_token_consultar_servico
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
+from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Services_Agendamentos.Verificacao_Dados.Veficacao_IDColaborador import verificar_id_colaborador
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificar_horarios import verificar_horario_valido
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificacao_Data import verificar_data
+from ....services.Services_Agendamentos.Verificacao_Dados.Verificacao_IDServiço import verificar_ids_servicos
+from ....services.Services_Agendamentos.Consulta_DataBase.Criar_agendamento import agendar
 
 criar_agendamento_bp = Blueprint('criar_agendamento', __name__)
 
