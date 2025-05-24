@@ -1,22 +1,22 @@
 from flask import Blueprint, request, jsonify
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_token_fernet import verificar_token_fernet
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_token_jwt import verificar_token_jwt
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_email import verificar_email
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_senha import verificar_senha
-from ....services.Services_Agendamentos.Consulta_DataBase.Consultar_ID_User import consultar_id_user
-from ....services.Services_Agendamentos.Hashe_senha.Autendicar_senha import autenticar_senha
-from ....services.Services_Agendamentos.Gerar_Token_JWT.Gerar_JWT_IDUser import gerar_jwt_id_estabelecimento
+from ....services.Cliente.Sanetizar_dados.sanitizar_token_fernet import verificar_token_fernet
+from ....services.Cliente.Sanetizar_dados.sanitizar_token_jwt import verificar_token_jwt
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_autenticar_user import validar_token_autenticar_user
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_ID_estabelecimento import validar_token_id_estabelecimento
+from ....services.Cliente.Sanetizar_dados.sanitizar_email import verificar_email
+from ....services.Cliente.Sanetizar_dados.sanitizar_senha import verificar_senha
+from ....services.Cliente.Consulta_DataBase.Consultar_ID_User import consultar_id_user
+from ....services.Cliente.Hashe_senha.Autendicar_senha import autenticar_senha
+from ....services.Cliente.Gerar_Token_JWT.Gerar_JWT_IDUser import gerar_jwt_id_estabelecimento
 
 autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/autenticar_user')
 
 @autenticar_user_bp.route('', methods=['POST'])
 def autenticar_user():
-    # Recupera os parâmetros do cabeçalho
+    # Recupera o token Fernet do cabeçalho e o token do estabelecimento do cookie
     authorization = request.headers.get('Authorization')
-    token_estabelecimento = request.headers.get('token-estabelecimento')
-    
+    token_estabelecimento = request.cookies.get('token_estabelecimento')  # Alterado para cookie
+
     # Verifica se ambos os parâmetros estão presentes e não são vazios
     if authorization and token_estabelecimento:
         # Primeiro, realiza as verificações estruturais dos tokens
@@ -46,11 +46,20 @@ def autenticar_user():
                                 if autenticar_senha(estabelecimento_id, user_id, senha):
                                     # Chama a função para gerar o JWT com o id do user
                                     jwt_token = gerar_jwt_id_estabelecimento(user_id)
-                                    return jsonify({
+                                    resposta =  jsonify({
                                         "status": "success",
                                         "message": "User autenticado",
                                         "token": jwt_token
-                                    }), 200
+                                    })
+                                    resposta.set_cookie(
+                                            "token_user",
+                                            jwt_token,
+                                            httponly=True,
+                                            secure=False,      # Em produção, usar True
+                                            samesite="None",   # Em produção, mantenha None se for cross-site
+                                            max_age=60
+                                    )
+                                    return resposta, 200
                                 else:
                                     return jsonify({
                                         "status": "error",

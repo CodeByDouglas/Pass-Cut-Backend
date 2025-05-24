@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_Inicial import validar_token_redirecionamento_inicial
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_token_fernet import verificar_token_fernet
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_id_base import verificar_id_base
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_nome_estabelecimento import verificar_nome_estabelecimento
-from ....services.Services_Agendamentos.Consulta_DataBase.Consulta_ID_Estabelecimento import consultar_estabelecimento
-from ....services.Services_Agendamentos.Gerar_Token_JWT.Gerar_JWT_IDEstabelecimento import gerar_jwt_id_estabelecimento
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_Inicial import validar_token_redirecionamento_inicial
+from ....services.Cliente.Sanetizar_dados.sanitizar_token_fernet import verificar_token_fernet
+from ....services.Cliente.Sanetizar_dados.sanitizar_id_base import verificar_id_base
+from ....services.Cliente.Sanetizar_dados.sanitizar_nome_estabelecimento import verificar_nome_estabelecimento
+from ....services.Cliente.Consulta_DataBase.Consulta_ID_Estabelecimento import consultar_estabelecimento
+from ....services.Cliente.Gerar_Token_JWT.Gerar_JWT_IDEstabelecimento import gerar_jwt_id_estabelecimento
 
 redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix='/api/redirecionamento_inicial')
 
@@ -29,11 +29,20 @@ def redirecionamento_inicial():
                         if resultado is not False:
                             sucesso, estabelecimento_id = resultado
                             jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
-                            return jsonify({
+                            resposta = jsonify({
                                 "status": "success",
-                                "message": "Base autenticada",
-                                "Token": jwt_token
-                            }), 200
+                                "message": "Base autenticada"
+                                
+                            })
+                            resposta.set_cookie(
+                                "token_estabelecimento",   # Corrigido o nome do cookie
+                                jwt_token,
+                                httponly=True,
+                                secure=False,              # Em produção, use True
+                                samesite="None",           # Em produção, mantenha None se for cross-site
+                                max_age=60
+                            )
+                            return resposta, 200
                         else:
                             return jsonify({
                                 "status": "error",
@@ -61,6 +70,6 @@ def redirecionamento_inicial():
             }), 401
     else:
         return jsonify({
-            "status": "error",
-            "message": "Erro de autenticação"
-        }), 401
+                "status": "error",
+                "message": "Erro de autenticação"
+            }), 401

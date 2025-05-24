@@ -1,20 +1,20 @@
 from flask import Blueprint, request, jsonify
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_token_fernet import verificar_token_fernet
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_token_jwt import verificar_token_jwt
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_cancelar_agendamento import validar_token_cancelar_agendamento
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_estebelecimento import validar_token_id_estabelecimento
-from ....services.Services_Agendamentos.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
-from ....services.Services_Agendamentos.Verificacao_Dados.sanitizar_id_agendamento import verificar_id_agendamento
-from ....services.Services_Agendamentos.Consulta_DataBase.Cancelar_agendamento import cancelar_agendamento_db
+from ....services.Cliente.Sanetizar_dados.sanitizar_token_fernet import verificar_token_fernet
+from ....services.Cliente.Sanetizar_dados.sanitizar_token_jwt import verificar_token_jwt
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_cancelar_agendamento import validar_token_cancelar_agendamento
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_ID_estabelecimento import validar_token_id_estabelecimento
+from ....services.Cliente.Autenticacao_Tokens.Validar_Token_ID_user import validar_token_id_user
+from ....services.Cliente.Sanetizar_dados.sanitizar_id_agendamento import verificar_id_agendamento
+from ....services.Cliente.Consulta_DataBase.Cancelar_agendamento import cancelar_agendamento_db
 
 cancelar_agendamento_bp = Blueprint('cancelar_agendamento', __name__)
 
 @cancelar_agendamento_bp.route('/cancelar-agendamento', methods=['POST'])
 def cancelar_agendamento():
     auth = request.headers.get('auth')
-    token_estabelecimento = request.headers.get('token-estabelecimento')
-    token_user = request.headers.get('token-user')
-    
+    token_estabelecimento = request.cookies.get('token_estabelecimento')  # Agora busca do cookie
+    token_user = request.cookies.get('token_user')  # Agora busca do cookie
+
     if auth and token_estabelecimento and token_user:
         if (verificar_token_fernet(auth) and 
             verificar_token_jwt(token_estabelecimento) and 
@@ -55,8 +55,7 @@ def cancelar_agendamento():
                                 return jsonify({
                                     "status": "error",
                                     "message": "Dados Insuficientes"
-                                    
-                                    }), 400
+                                }), 400
                         else:
                             return jsonify({
                                 "status": "error",
