@@ -35,7 +35,11 @@ def consultar_horarios():
                     if isinstance(valid_user, tuple):
                         _, user_id = valid_user
                     else:
-                        return jsonify({"erro": "Autenticação falhou - erro no user"}), 401
+                        return jsonify({
+                            "status": "error",
+                            "message": "Autenticação falhou - erro no user"
+
+                        }), 401
 
                     req_data = request.get_json()
                     if req_data and isinstance(req_data, dict):
@@ -47,15 +51,24 @@ def consultar_horarios():
                             
                             # Valida cada parâmetro antes de processar os horários:
                             if not verificar_id_colaborador(colaborador_id):
-                                return jsonify({"erro": "Dados invalidos: colaborador_id inválido"}), 400
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Dados invalidos: colaborador_id inválido"
+                                }), 400
                             
                             if not verificar_data(data_agendamento):
-                                return jsonify({"erro": "Dados invalidos: data inválida"}), 400
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Dados invalidos: data inválida"
+                                    }), 400
                             
                             if verificar_ids_servicos(servicos):
                                 resultado = consultar_horarios_agendamento(estabelecimento_id, colaborador_id, data_agendamento, servicos)
                                 if resultado is False:
-                                    return jsonify({"erro": "Erro interno ao processar solicitação"}), 501
+                                    return jsonify({
+                                        "status": "error",
+                                        "message": "Erro interno ao processar solicitação"
+                                    }), 501
                                 success, horarios_array = resultado
                                 
                                 if horarios_array == [None]:
@@ -68,13 +81,31 @@ def consultar_horarios():
                                         "horarios": [slot.strftime("%H:%M:%S") for slot in horarios_array]
                                     }), 200
                             else:
-                                return jsonify({"erro": "Dados invalidos: ids de serviço inválidos"}), 400
-                    return jsonify({"erro": "Dados insuficientes"}), 400
+                                return jsonify({
+                                    "status": "error",
+                                    "message":"Dados invalidos: ids de serviço inválidos"
+                                }), 400
+                    return jsonify({
+                        "status": "error",
+                        "message": "Dados Insuficientes"
+                    }), 400
                 else:
-                    return jsonify({"erro": "Autenticação falhou - erro ao validar token estabelecimento"}), 401
+                    return jsonify({
+                        "status": "error",
+                        "message": "Autenticação falhou - erro ao validar token estabelecimento"
+                    }), 401
             else:
-                return jsonify({"erro": "Autenticação falhou - erro no token da API"}), 401
+                return jsonify({
+                    "status": "error",
+                    "message": "Autenticação falhou - erro no token da API"
+                }), 401
         else:
-            return jsonify({"erro": "Autenticação falhou - erro na verificação dos tokens"}), 401
+            return jsonify({
+                "statua": "error",
+                "message":"Autenticação falhou - erro na verificação dos tokens"
+            }), 401
     else:
-        return jsonify({"erro": "Autenticação falhou - cabeçalhos não encontrados"}), 401
+        return jsonify({
+            "status": "error",
+            "message":"Autenticação falhou - cabeçalhos não encontrados"
+        }), 401

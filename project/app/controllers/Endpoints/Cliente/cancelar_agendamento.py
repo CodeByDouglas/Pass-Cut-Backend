@@ -42,13 +42,32 @@ def cancelar_agendamento():
                                     if cancelar_agendamento_db(agendamento_id, estabelecimento_id, user_id):
                                         return jsonify({"message": "Agendamento cancelado com sucesso"}), 200
                                     else:
-                                        return jsonify({"erro": "Não foi possível cancelar o agendamento. Erro interno."}), 500
+                                        return jsonify({
+                                            "status": "error",
+                                            "message": "Erro interno"
+                                        }), 500
                                 else:
-                                    return jsonify({"erro": "Dados invalidos: agendamento_id inválido"}), 400
+                                    return jsonify({
+                                        "status": "error",
+                                        "message": "Dados inválidos"
+                                    }), 400
                             else:
-                                return jsonify({"erro": "Dados insuficientes"}), 411
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Dados Insuficientes"
+                                    
+                                    }), 400
                         else:
-                            return jsonify({"erro": "Dados insuficientes"}), 411
+                            return jsonify({
+                                "status": "error",
+                                "message": "Dados insuficientes"
+                            }), 400
                     else:
-                        return jsonify({"erro": "Autenticação falhou - erro no user"}), 401
-    return jsonify({"erro": "Autenticação falhou"}), 401
+                        return jsonify({
+                            "status": "error",
+                            "message": "Autenticação Falhou - erro no user"
+                        }), 401
+    return jsonify({
+        "status": "error",
+        "message": "Autenticação Falhou"
+    }), 401

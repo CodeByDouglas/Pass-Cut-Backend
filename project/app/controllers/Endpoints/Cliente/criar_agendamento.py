@@ -55,24 +55,49 @@ def criar_agendamento():
                                 elif isinstance(resultado, tuple) and resultado[0] is False:
                                     mensagem = resultado[1]
                                     if mensagem == "Erro interno":
-                                        return jsonify({"erro": "Erro interno ao processar o agendamento"}), 500
+                                        return jsonify({
+                                            "status":"error",
+                                            "message": "Erro interno ao processar o agendamento"
+                                        }), 500
                                     elif mensagem == "Horário indisponível":
-                                        return jsonify({"message": "Infelizmente o horário solicitado acabou de ser preenchido e não está mais disponível."}), 204
+                                        return jsonify({
+                                            "status": "error",
+                                            "message": "Infelizmente o horário solicitado acabou de ser preenchido e não está mais disponível."
+                                        }), 204
                                     else:
                                         return jsonify({"erro": mensagem}), 400
-                                else:
-                                    return jsonify({"erro": "Erro desconhecido"}), 500
                             else:
-                                return jsonify({"erro": "Dados invalidos"}), 400
+                                return jsonify({
+                                    "status": "error",
+                                    "message": "Dados invalidos"
+                                }), 400
                         else:
-                            return jsonify({"erro": "Dados insuficientes para a consulta"}), 400
+                            return jsonify({
+                                "status": "error",
+                                "message": "Dados insuficientes"
+                            }), 400
                     else:
-                        return jsonify({"erro": "Erro de autenticação"}), 401
+                        return jsonify({
+                            "status": "error",
+                            "message": "Erro de autenticação"
+                        }), 401
                 else:
-                    return jsonify({"erro": "Erro de autenticação"}), 401
+                    return jsonify({
+                        "status": "error",
+                        "message": "Erro de autenticação"
+                    }), 401
             else:
-                return jsonify({"erro": "Erro de autenticação"}), 401
+                return jsonify({
+                    "status": "error",
+                    "message": "Erro de autenticação"
+                }), 401
         else:
-            return jsonify({"erro": "Erro de autenticação"}), 401
+            return jsonify({
+                "status": "error",
+                "message": "Erro de autenticação"
+            }), 401
     else:
-        return jsonify({"erro": "Erro de autenticação"}), 401
+        return jsonify({
+            "status": "error",
+            "message": "Erro de autenticação"
+           }), 401

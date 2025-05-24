@@ -19,7 +19,7 @@ def redirecionamento_inicial():
                 # Extrai dados do corpo da requisição (JSON)
                 data = request.get_json() or {}
                 nome = data.get("nome")
-                id_base = data.get("ID base")
+                id_base = data.get("IDbase")
                 
                 # Verifica se ambos os dados estão presentes e não são nulos
                 if nome is not None and id_base is not None:

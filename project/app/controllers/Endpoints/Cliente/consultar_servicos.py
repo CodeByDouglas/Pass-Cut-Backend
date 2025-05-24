@@ -32,7 +32,10 @@ def consultar_servicos():
                     if isinstance(result_user, tuple):
                         _, user_id = result_user
                     else:
-                        return jsonify({"erro": "Autenticação falhou"}), 401
+                        return jsonify({
+                            "status": "error",
+                            "message": "Erro de Autenticação"
+                        }), 401
 
                     # Chama a função para consultar os serviços do estabelecimento
                     result = consultar_servicos_por_estabelecimento(estabelecimento_id)
@@ -45,7 +48,16 @@ def consultar_servicos():
                                 "user_id": user_id,
                                 "servicos": servicos_array
                             }), 200
-                    return jsonify({"erro": "não foi possível localizar os dados"}), 404
+                    return jsonify({
+                        "status": "error",
+                        "message": "não foi possível localizar os dados"
+                        }), 404
                 else:
-                    return jsonify({"erro": "Autenticação falhou"}), 401                    
-    return jsonify({"erro": "Autenticação falhou"}), 401
+                    return jsonify({
+                        "status": "error",
+                        "message": "Erro de Autentiicação"
+                    }), 401                    
+    return jsonify({
+        "status":"error",
+        "message": "Erro de Autenticação"
+    }), 401
