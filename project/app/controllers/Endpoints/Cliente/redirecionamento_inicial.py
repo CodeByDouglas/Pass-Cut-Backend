@@ -36,11 +36,13 @@ def redirecionamento_inicial():
                             })
                             resposta.set_cookie(
                                 "token_estabelecimento",   # Corrigido o nome do cookie
-                                jwt_token,
-                                httponly=True,
-                                secure=False,              # Em produção, use True
-                                samesite="None",           # Em produção, mantenha None se for cross-site
-                                max_age=60
+                                jwt_token,                # valor do JWT
+                                httponly=True,            # inacessível via JavaScript
+                                secure=True,             # em DEV; em produção **deve** ser True
+                                samesite='None',          # permite cross-site
+                                max_age=3600,             # 60 minutos em segundos
+                                path='/'                  # escopo global no domínio
+                                # domain='seu-backend.com' # opcional: restrinja ao seu domínio
                             )
                             return resposta, 200
                         else:

@@ -23,8 +23,14 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    cors.init_app(app)
 
+    cors.init_app(app,
+        supports_credentials=True,
+        origins=[
+            "https://7dcc-74-249-85-196.ngrok-free.app"  # URL pública do Ngrok para o frontend
+        ]
+    )
+   
     # importa os models para que o SQLAlchemy os registre
     from .models import models
 

@@ -15,7 +15,8 @@ autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/aut
 def autenticar_user():
     # Recupera o token Fernet do cabeçalho e o token do estabelecimento do cookie
     authorization = request.headers.get('Authorization')
-    token_estabelecimento = request.cookies.get('token_estabelecimento')  # Alterado para cookie
+    token_estabelecimento = request.cookies.get('token_estabelecimento')
+    print(token_estabelecimento)  # Alterado para cookie
 
     # Verifica se ambos os parâmetros estão presentes e não são vazios
     if authorization and token_estabelecimento:
@@ -55,9 +56,9 @@ def autenticar_user():
                                             "token_user",
                                             jwt_token,
                                             httponly=True,
-                                            secure=False,      # Em produção, usar True
+                                            secure=True,      # Em produção, usar True
                                             samesite="None",   # Em produção, mantenha None se for cross-site
-                                            max_age=60
+                                            max_age=3600
                                     )
                                     return resposta, 200
                                 else:
@@ -86,9 +87,9 @@ def autenticar_user():
                 }), 401
             return jsonify({
                 "status": "error",
-                "message": "Erro de autenticação"
+                "message": "Código do Endpoint Incorreto - Erro de autenticação"
             }), 401
     return jsonify({
         "status": "error",
-        "message": "Erro de autenticação"
+        "message": "Os dados estão sendo passados - Erro de autenticação"
     }), 401

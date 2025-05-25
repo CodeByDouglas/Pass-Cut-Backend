@@ -21,4 +21,4 @@ def hashear_senha(senha: str) -> str:
     hash_str = hash_bytes.decode('utf-8')
     
     return hash_str
-
+print(hashear_senha('Senha.123'))
