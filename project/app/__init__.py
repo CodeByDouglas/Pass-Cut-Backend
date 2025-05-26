@@ -27,7 +27,7 @@ def create_app(config_class=Config):
     cors.init_app(app,
         supports_credentials=True,
         origins=[
-            "https://7dcc-74-249-85-196.ngrok-free.app"  # URL pública do Ngrok para o frontend
+            "https://cbb7-135-237-130-224.ngrok-free.app"  # URL pública do Ngrok para o frontend
         ]
     )
    

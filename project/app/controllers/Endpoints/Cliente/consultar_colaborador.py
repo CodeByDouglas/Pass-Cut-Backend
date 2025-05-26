@@ -10,7 +10,7 @@ consultar_colaborador_bp = Blueprint('consultar_colaborador', __name__)
 
 @consultar_colaborador_bp.route('/consultar-colaborador', methods=['POST'])
 def consultar_colaborador():
-    auth = request.headers.get('auth')
+    auth = request.headers.get('Authorization')
     token_estabelecimento = request.cookies.get('token_estabelecimento')  # Agora busca do cookie
     token_user = request.cookies.get('token_user')  # Agora busca do cookie
     

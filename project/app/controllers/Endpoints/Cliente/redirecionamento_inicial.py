@@ -11,67 +11,42 @@ redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix
 @redirecionamento_bp.route('', methods=['POST'])
 def redirecionamento_inicial():
     token = request.headers.get('Authorization')
-    if token:
-        # Primeiramente, verifica se o token é um token Fernet válido
-        if verificar_token_fernet(token):
-            # Se o token é Fernet, prossegue com a validação inicial
-            if validar_token_redirecionamento_inicial(token):
-                # Extrai dados do corpo da requisição (JSON)
-                data = request.get_json() or {}
-                nome = data.get("nome")
-                id_base = data.get("IDbase")
-                
-                # Verifica se ambos os dados estão presentes e não são nulos
-                if nome is not None and id_base is not None:
-                    # Valida os dados usando as funções correspondentes
-                    if verificar_id_base(id_base) and verificar_nome_estabelecimento(nome):
-                        resultado = consultar_estabelecimento(nome, id_base)
-                        if resultado is not False:
-                            sucesso, estabelecimento_id = resultado
-                            jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
-                            resposta = jsonify({
-                                "status": "success",
-                                "message": "Base autenticada"
-                                
-                            })
-                            resposta.set_cookie(
-                                "token_estabelecimento",   # Corrigido o nome do cookie
-                                jwt_token,                # valor do JWT
-                                httponly=True,            # inacessível via JavaScript
-                                secure=True,             # em DEV; em produção **deve** ser True
-                                samesite='None',          # permite cross-site
-                                max_age=3600,             # 60 minutos em segundos
-                                path='/'                  # escopo global no domínio
-                                # domain='seu-backend.com' # opcional: restrinja ao seu domínio
-                            )
-                            return resposta, 200
-                        else:
-                            return jsonify({
-                                "status": "error",
-                                "message": "Estabelecimento não encontrado."
-                            }), 404
-                    else:
-                        return jsonify({
-                            "status": "error",
-                            "message": "Dados invalidos"
-                        }), 400
-                else:
-                    return jsonify({
-                        "status": "error",
-                        "message": "Dados insuficientes"
-                    }), 400
-            else:
-                return jsonify({
-                    "status": "error",
-                    "message": "Erro de autenticação"
-                }), 401
-        else:
-            return jsonify({
-                "status": "error",
-                "message": "Erro de autenticação"
-            }), 401
-    else:
-        return jsonify({
-                "status": "error",
-                "message": "Erro de autenticação"
-            }), 401
+    if not token:
+        return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
+
+    if not verificar_token_fernet(token):
+        return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
+
+    if not validar_token_redirecionamento_inicial(token):
+        return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
+
+    data = request.get_json() or {}
+    nome = data.get("nome")
+    id_base = data.get("IDbase")
+
+    if nome is None or id_base is None:
+        return jsonify({"status": "error", "message": "Dados insuficientes"}), 400
+
+    if not (verificar_id_base(id_base) and verificar_nome_estabelecimento(nome)):
+        return jsonify({"status": "error", "message": "Dados invalidos"}), 400
+
+    resultado = consultar_estabelecimento(nome, id_base)
+    if resultado is False:
+        return jsonify({"status": "error", "message": "Estabelecimento não encontrado."}), 404
+
+    _, estabelecimento_id = resultado
+    jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
+    resposta = jsonify({
+        "status": "success",
+        "message": "Base autenticada"
+    })
+    resposta.set_cookie(
+        "token_estabelecimento",
+        jwt_token,
+        httponly=True,
+        secure=True,
+        samesite='None',
+        max_age=3600,
+        path='/'
+    )
+    return resposta, 200

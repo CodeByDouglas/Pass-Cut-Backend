@@ -24,7 +24,7 @@ def consultar_agendamentos_por_estabelecimento_cliente_status(estabelecimento_id
         agendamentos = db.session.query(Agendamento).filter(
             Agendamento.estabelecimento_id == estabelecimento_id,
             Agendamento.cliente_id == cliente_id,
-            Agendamento.status.in_(["Confirmado", "pendente"])
+            Agendamento.status.in_(["confirmado", "pendente"])
         ).all()
     elif status == "historico":
         agendamentos = db.session.query(Agendamento).filter(
@@ -45,8 +45,11 @@ def consultar_agendamentos_por_estabelecimento_cliente_status(estabelecimento_id
     resultados = []
     for ag in agendamentos:
         dados = {
-            "data_hora": ag.data_hora.isoformat() if ag.data_hora else None,
+            "id": str(ag.id),
+            "data": ag.data.isoformat() if ag.data else None,
+            "horas": [h.strftime("%H:%M:%S") for h in ag.horas] if ag.horas else [],
             "duracao": ag.duracao,
+            "status": ag.status,  # Adicionado o status do agendamento
             "colaborador": ag.colaborador.nome if ag.colaborador and hasattr(ag.colaborador, 'nome') else None,
             "servicos": [servico.nome for servico in ag.servicos if hasattr(servico, 'nome')],
             "estabelecimento": ag.estabelecimento.nome_fantasia if ag.estabelecimento and hasattr(ag.estabelecimento, 'nome_fantasia') else None

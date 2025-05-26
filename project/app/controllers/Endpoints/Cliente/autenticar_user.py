@@ -13,83 +13,77 @@ autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/aut
 
 @autenticar_user_bp.route('', methods=['POST'])
 def autenticar_user():
-    # Recupera o token Fernet do cabeçalho e o token do estabelecimento do cookie
     authorization = request.headers.get('Authorization')
     token_estabelecimento = request.cookies.get('token_estabelecimento')
-    print(token_estabelecimento)  # Alterado para cookie
 
-    # Verifica se ambos os parâmetros estão presentes e não são vazios
-    if authorization and token_estabelecimento:
-        # Primeiro, realiza as verificações estruturais dos tokens
-        if verificar_token_fernet(authorization) and verificar_token_jwt(token_estabelecimento):
-            # Valida os tokens com as funções específicas
-            if validar_token_autenticar_user(authorization):
-                resultado = validar_token_id_estabelecimento(token_estabelecimento)
-                if resultado is not False:
-                    # Desempacota o resultado para obter o ID do estabelecimento
-                    _, estabelecimento_id = resultado
-                    
-                    # Recupera dados do corpo da requisição utilizando silent=True para evitar 400 Bad Request
-                    data = request.get_json(silent=True) or {}
-                    login = data.get("login")
-                    senha = data.get("senha")
-                    
-                    # Verifica se "login" e "senha" estão presentes e não são vazios
-                    if login and senha:
-                        # Valida o email e a senha
-                        if verificar_email(login) and verificar_senha(senha):
-                            # Consulta o ID do user a partir do ID do estabelecimento e do email (login)
-                            consulta = consultar_id_user(estabelecimento_id, login)
-                            if consulta is not False:
-                                # Desempacota o resultado para obter o ID do user
-                                _, user_id = consulta
-                                # Chama a função para autenticar a senha
-                                if autenticar_senha(estabelecimento_id, user_id, senha):
-                                    # Chama a função para gerar o JWT com o id do user
-                                    jwt_token = gerar_jwt_id_estabelecimento(user_id)
-                                    resposta =  jsonify({
-                                        "status": "success",
-                                        "message": "User autenticado",
-                                        "token": jwt_token
-                                    })
-                                    resposta.set_cookie(
-                                            "token_user",
-                                            jwt_token,
-                                            httponly=True,
-                                            secure=True,      # Em produção, usar True
-                                            samesite="None",   # Em produção, mantenha None se for cross-site
-                                            max_age=3600
-                                    )
-                                    return resposta, 200
-                                else:
-                                    return jsonify({
-                                        "status": "error",
-                                        "message": "Erro ao autenticar user"
-                                    }), 401
-                            else:
-                                return jsonify({
-                                    "status": "error",
-                                    "message": "Usuário não encontrado"
-                                }), 401
-                        else:
-                            return jsonify({
-                                "status": "error",
-                                "message": "Erro dados invalidos"
-                            }), 400
-                    else:
-                        return jsonify({
-                            "status": "error",
-                            "message": "Erro dados insuficientes"
-                        }), 411
-                return jsonify({
-                    "status": "error",
-                    "message": "Erro de autenticação"
-                }), 401
-            return jsonify({
-                "status": "error",
-                "message": "Código do Endpoint Incorreto - Erro de autenticação"
-            }), 401
-    return jsonify({
-        "status": "error",
-        "message": "Os dados estão sendo passados - Erro de autenticação"
-    }), 401
+    if not (authorization and token_estabelecimento):
+        return jsonify({
+            "status": "error",
+            "message": "Os dados não estão sendo passados - Erro de autenticação"
+        }), 401
+
+    if not (verificar_token_fernet(authorization) and verificar_token_jwt(token_estabelecimento)):
+        return jsonify({
+            "status": "error",
+            "message": "Código do Endpoint Incorreto - Erro de autenticação"
+        }), 401
+
+    if not validar_token_autenticar_user(authorization):
+        return jsonify({
+            "status": "error",
+            "message": "Erro de autenticação"
+        }), 401
+
+    resultado = validar_token_id_estabelecimento(token_estabelecimento)
+    if resultado is False:
+        return jsonify({
+            "status": "error",
+            "message": "Erro de autenticação"
+        }), 401
+
+    _, estabelecimento_id = resultado
+    data = request.get_json(silent=True) or {}
+    login = data.get("login")
+    senha = data.get("senha")
+
+    if not (login and senha):
+        return jsonify({
+            "status": "error",
+            "message": "Erro dados insuficientes"
+        }), 411
+
+    if not (verificar_email(login) and verificar_senha(senha)):
+        return jsonify({
+            "status": "error",
+            "message": "Erro dados invalidos"
+        }), 400
+
+    consulta = consultar_id_user(estabelecimento_id, login)
+    if consulta is False:
+        return jsonify({
+            "status": "error",
+            "message": "Usuário não encontrado"
+        }), 401
+
+    _, user_id = consulta
+    if not autenticar_senha(estabelecimento_id, user_id, senha):
+        return jsonify({
+            "status": "error",
+            "message": "Erro ao autenticar user"
+        }), 401
+
+    jwt_token = gerar_jwt_id_estabelecimento(user_id)
+    resposta = jsonify({
+        "status": "success",
+        "message": "User autenticado",
+        "token": jwt_token
+    })
+    resposta.set_cookie(
+        "token_user",
+        jwt_token,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=3600
+    )
+    return resposta, 200
