@@ -10,54 +10,62 @@ consultar_colaborador_bp = Blueprint('consultar_colaborador', __name__)
 
 @consultar_colaborador_bp.route('/consultar-colaborador', methods=['POST'])
 def consultar_colaborador():
-    auth = request.headers.get('Authorization')
-    token_estabelecimento = request.cookies.get('token_estabelecimento')  # Agora busca do cookie
-    token_user = request.cookies.get('token_user')  # Agora busca do cookie
-    
-    if auth and token_estabelecimento and token_user:
-        if (verificar_token_fernet(auth) and 
-            verificar_token_jwt(token_estabelecimento) and 
-            verificar_token_jwt(token_user)):
-            if validar_token_consultar_colaborador(auth):
-                result_est = validar_token_id_estabelecimento(token_estabelecimento)
-                # Verifica se o retorno é uma tupla antes de desempacotar
-                if isinstance(result_est, tuple):
-                    valid_est, estabelecimento_id = result_est
-                else:
-                    valid_est = result_est
-                    estabelecimento_id = None
-                    
-                if valid_est and estabelecimento_id:
-                    result_user = validar_token_id_user(estabelecimento_id, token_user)
-                    if isinstance(result_user, tuple):
-                        _, user_id = result_user
-                    else:
-                        return jsonify({
-                            "status": "error",
-                            "message": "Autenticação Falhou"
-                        }), 401
+    """
+    Endpoint para consulta de colaboradores do estabelecimento.
 
-                    # Chama a função para consultar os serviços do estabelecimento
-                    result = consultar_colaboradores_por_estabelecimento(estabelecimento_id)
-                    if result:
-                        success, servicos_array = result
-                        if success:
-                            return jsonify({
-                                "message": "Requisição bem sucedida",
-                                "estabelecimento_id": estabelecimento_id,
-                                "user_id": user_id,
-                                "servicos": servicos_array
-                            }), 200
-                    return jsonify({
-                        "status":"error",
-                        "message": "Não foi possível localizar os dados"
-                    }), 404
-                else:
-                    return jsonify({
-                        "status": "error",
-                        "message": "Autenticação Falhou"
-                    }), 401                    
+    Espera receber:
+    - Header 'Authorization' com token Fernet válido.
+    - Cookies 'token_estabelecimento' e 'token_user' com JWTs válidos.
+
+    Fluxo:
+    1. Valida presença dos dados obrigatórios.
+    2. Valida tokens.
+    3. Valida credenciais do usuário e do estabelecimento.
+    4. Consulta colaboradores no banco.
+
+    Returns:
+        200: Consulta realizada com sucesso.
+        401: Falha de autenticação.
+        404: Não foi possível localizar os dados.
+    """
+    auth = request.headers.get('Authorization')
+    token_estabelecimento = request.cookies.get('token_estabelecimento')
+    token_user = request.cookies.get('token_user')
+
+    if not (auth and token_estabelecimento and token_user):
+        return jsonify({"erro": "Autenticação falhou"}), 401
+
+    if not (verificar_token_fernet(auth) and verificar_token_jwt(token_estabelecimento) and verificar_token_jwt(token_user)):
+        return jsonify({"erro": "Autenticação falhou"}), 401
+
+    if not validar_token_consultar_colaborador(auth):
+        return jsonify({"erro": "Autenticação falhou"}), 401
+
+    result_est = validar_token_id_estabelecimento(token_estabelecimento)
+    if isinstance(result_est, tuple):
+        valid_est, estabelecimento_id = result_est
+    else:
+        valid_est = result_est
+        estabelecimento_id = None
+
+    if not (valid_est and estabelecimento_id):
+        return jsonify({"erro": "Autenticação falhou"}), 401
+
+    result_user = validar_token_id_user(estabelecimento_id, token_user)
+    if not isinstance(result_user, tuple):
+        return jsonify({"erro": "Autenticação falhou"}), 401
+    _, user_id = result_user
+
+    result = consultar_colaboradores_por_estabelecimento(estabelecimento_id)
+    if result:
+        success, servicos_array = result
+        if success:
+            return jsonify({
+                "message": "Requisição bem sucedida",
+                "estabelecimento_id": estabelecimento_id,
+                "user_id": user_id,
+                "servicos": servicos_array
+            }), 200
     return jsonify({
-        "status": "error",
-        "message": "Autenticação falhou"
-    }), 401
+        "erro": "Não foi possível localizar os dados"
+    }), 404

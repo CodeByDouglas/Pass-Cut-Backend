@@ -27,4 +27,4 @@ def gerar_jwt_id_estabelecimento(estabelecimento_id: str, exp_minutes: int = 60)
     
     token = jwt.encode(payload, secret, algorithm="HS256")
     return token
-print(gerar_jwt_id_estabelecimento("5a7e3f8d-1234-4abc-9876-9f1234567890"))
+print(gerar_jwt_id_estabelecimento(""))

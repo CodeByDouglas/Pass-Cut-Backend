@@ -13,19 +13,39 @@ autenticar_user_bp = Blueprint('autenticar_user', __name__, url_prefix='/api/aut
 
 @autenticar_user_bp.route('', methods=['POST'])
 def autenticar_user():
+    """
+    Endpoint para autenticação de usuário do cliente.
+
+    Espera receber:
+    - Header 'Authorization' com token Fernet válido.
+    - Cookie 'token_estabelecimento' com JWT do estabelecimento.
+    - JSON no corpo com 'login' (email) e 'senha'.
+
+    Fluxo:
+    1. Valida presença dos dados obrigatórios.
+    2. Valida tokens.
+    3. Valida credenciais do usuário.
+    4. Gera JWT do usuário autenticado e retorna em cookie httpOnly.
+
+    Returns:
+        200: Autenticação bem-sucedida, retorna token em cookie e no corpo.
+        400: Dados inválidos.
+        401: Falha de autenticação.
+        411: Dados insuficientes.
+    """
     authorization = request.headers.get('Authorization')
     token_estabelecimento = request.cookies.get('token_estabelecimento')
 
     if not (authorization and token_estabelecimento):
         return jsonify({
             "status": "error",
-            "message": "Os dados não estão sendo passados - Erro de autenticação"
+            "message": "Erro de autenticação"
         }), 401
 
     if not (verificar_token_fernet(authorization) and verificar_token_jwt(token_estabelecimento)):
         return jsonify({
             "status": "error",
-            "message": "Código do Endpoint Incorreto - Erro de autenticação"
+            "message": "Erro de autenticação"
         }), 401
 
     if not validar_token_autenticar_user(authorization):

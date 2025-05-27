@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy import Time
 from app.extensions import db
 
-# Tabela de associação para muitos-para-muitos entre Agendamento e Serviço
+# Associação muitos-para-muitos entre Agendamento e Serviço
 agendamento_servico = db.Table(
     'agendamento_servico',
     db.Column('agendamento_id', UUID(as_uuid=True), db.ForeignKey('agendamentos.id'), primary_key=True),
@@ -35,6 +35,7 @@ class BaseModel(db.Model):
     deleted = db.Column(db.Boolean, default=False, nullable=False)
 
 
+# Funcionamento do estabelecimento
 class Funcionamento(BaseModel):
     __tablename__ = 'funcionamentos'
 
@@ -66,6 +67,7 @@ class Funcionamento(BaseModel):
     )
 
 
+# Horários disponíveis
 class Horario(BaseModel):
     __tablename__ = 'horarios'
 
@@ -77,13 +79,6 @@ class Horario(BaseModel):
     )
     data = db.Column(db.Date, nullable=False)
     horarios = db.Column(ARRAY(Time), nullable=False)
-
-    estabelecimento = db.relationship(
-        'Estabelecimento', backref='horarios', lazy=True
-    )
-    colaborador = db.relationship(
-        'Colaborador', backref='horarios', lazy=True
-    )
 
     # Relacionamento: um Horario → muitos Agendamentos
     agendamentos = db.relationship(
@@ -98,7 +93,15 @@ class Horario(BaseModel):
         nullable=False     # força valor não-nulo
     )
 
+    estabelecimento = db.relationship(
+        'Estabelecimento', backref='horarios', lazy=True
+    )
+    colaborador = db.relationship(
+        'Colaborador', backref='horarios', lazy=True
+    )
 
+
+# Estabelecimento
 class Estabelecimento(BaseModel):
     __tablename__ = 'estabelecimentos'
 
@@ -116,6 +119,7 @@ class Estabelecimento(BaseModel):
     agendamentos = db.relationship('Agendamento', backref='estabelecimento', lazy=True)
 
 
+# Cliente
 class Cliente(BaseModel):
     __tablename__ = 'clientes'
 
@@ -137,6 +141,7 @@ class Cliente(BaseModel):
     agendamentos = db.relationship('Agendamento', backref='cliente', lazy=True)
 
 
+# Colaborador
 class Colaborador(BaseModel):
     __tablename__ = 'colaboradores'
 
@@ -167,6 +172,7 @@ class Servico(BaseModel):
     )
 
 
+# Plano
 class Plano(BaseModel):
     __tablename__ = 'planos'
 
@@ -182,6 +188,7 @@ class Plano(BaseModel):
     assinaturas = db.relationship('Assinatura', backref='plano', lazy=True)
 
 
+# Assinatura
 class Assinatura(BaseModel):
     __tablename__ = 'assinaturas'
 
@@ -198,6 +205,7 @@ class Assinatura(BaseModel):
     agendamentos = db.relationship('Agendamento', backref='assinatura', lazy=True)
 
 
+# Agendamento
 class Agendamento(BaseModel):
     __tablename__ = 'agendamentos'
 

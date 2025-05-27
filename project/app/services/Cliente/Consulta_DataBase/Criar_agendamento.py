@@ -80,7 +80,7 @@ def agendar(estabelecimento_id: str, cliente_id: str, servico_ids: list, colabor
         data=datetime.strptime(data, "%Y-%m-%d").date(),
         horas=horarios_ocupados,
         duracao=duracao_total,
-        status="agendado",
+        status="pendente",
         assinatura_id=assinatura_id
     )
     # Adiciona os serviços ao relacionamento muitos-para-muitos

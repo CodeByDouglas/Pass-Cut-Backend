@@ -10,11 +10,30 @@ consultar_agendamentos_bp = Blueprint('consultar_agendamentos', __name__, url_pr
 
 @consultar_agendamentos_bp.route('', methods=['POST'])
 def consultar_agendamentos():
+    """
+    Endpoint para consulta de agendamentos do cliente.
+
+    Espera receber:
+    - Header 'Authorization' com token Fernet válido.
+    - Cookies 'token_estabelecimento' e 'token_user' com JWTs válidos.
+    - JSON no corpo com 'type' ("ativos" ou "historico").
+
+    Fluxo:
+    1. Valida presença dos dados obrigatórios.
+    2. Valida tokens.
+    3. Valida tipo de consulta.
+    4. Consulta agendamentos no banco.
+
+    Returns:
+        200: Consulta realizada com sucesso ou nenhum agendamento encontrado.
+        400: Dados inválidos.
+        401: Falha de autenticação.
+        411: Dados insuficientes.
+    """
     auth = request.headers.get('Authorization')
     token_estabelecimento = request.cookies.get('token_estabelecimento')
     token_user = request.cookies.get('token_user')
 
-    # Validação inicial dos tokens
     if not (auth and token_estabelecimento and token_user):
         return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
 
@@ -44,7 +63,6 @@ def consultar_agendamentos():
 
     agendamentos = consultar_agendamentos_por_estabelecimento_cliente_status(estabelecimento_id, user_id, type_param)
     if agendamentos is not None:
-        print(agendamentos)
         return jsonify({
             "status": "success",
             "message": "Consulta realizada com sucesso.",

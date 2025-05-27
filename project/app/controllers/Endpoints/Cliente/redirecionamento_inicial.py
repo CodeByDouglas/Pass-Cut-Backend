@@ -10,6 +10,28 @@ redirecionamento_bp = Blueprint('redirecionamento_inicial', __name__, url_prefix
 
 @redirecionamento_bp.route('', methods=['POST'])
 def redirecionamento_inicial():
+    """
+    Endpoint para redirecionamento inicial do cliente.
+
+    Espera receber:
+    - Header 'Authorization' com token Fernet válido.
+    - JSON no corpo com:
+        - 'nome': nome do estabelecimento
+        - 'IDbase': identificador base do estabelecimento
+
+    Fluxo:
+    1. Valida presença do token e dos dados obrigatórios.
+    2. Valida o token Fernet e o token de redirecionamento.
+    3. Valida o formato dos dados.
+    4. Consulta o estabelecimento no banco.
+    5. Gera e retorna o JWT do estabelecimento em cookie httpOnly.
+
+    Returns:
+        200: Redirecionamento bem-sucedido, retorna token em cookie.
+        400: Dados insuficientes ou inválidos.
+        401: Falha de autenticação.
+        404: Estabelecimento não encontrado.
+    """
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
@@ -20,7 +42,7 @@ def redirecionamento_inicial():
     if not validar_token_redirecionamento_inicial(token):
         return jsonify({"status": "error", "message": "Erro de autenticação"}), 401
 
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
     nome = data.get("nome")
     id_base = data.get("IDbase")
 
@@ -38,7 +60,8 @@ def redirecionamento_inicial():
     jwt_token = gerar_jwt_id_estabelecimento(estabelecimento_id)
     resposta = jsonify({
         "status": "success",
-        "message": "Base autenticada"
+        "message": "Base autenticada",
+        "Token": jwt_token
     })
     resposta.set_cookie(
         "token_estabelecimento",
